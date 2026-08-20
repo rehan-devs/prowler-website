@@ -1,18 +1,23 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import {
   Key,
   Search,
   Eye,
   EyeOff,
-  RefreshCw,
-  Ban,
   CheckCircle,
   Clock,
   XCircle,
+  Ban,
+  Download,
+  Loader2,
+  AlertCircle,
+  CheckSquare,
+  Square,
+  RefreshCw,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -55,6 +60,13 @@ const statusConfig = {
   },
 };
 
+const bulkActions = [
+  { value: "activate", label: "Activate Selected", icon: CheckCircle, color: "accent-success" },
+  { value: "suspend", label: "Suspend Selected", icon: Ban, color: "accent-gold" },
+  { value: "revoke", label: "Revoke Selected", icon: XCircle, color: "accent-hot" },
+  { value: "reset_hardware", label: "Reset Hardware", icon: RefreshCw, color: "accent-primary" },
+];
+
 export function LicensesTable({
   licenses,
   currentStatus,
@@ -69,6 +81,90 @@ export function LicensesTable({
   const router = useRouter();
   const [search, setSearch] = useState(currentSearch);
   const [revealedKeys, setRevealedKeys] = useState<Set<string>>(new Set());
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [bulkError, setBulkError] = useState<string | null>(null);
+  const [bulkSuccess, setBulkSuccess] = useState<string | null>(null);
+  const [exportLoading, setExportLoading] = useState(false);
+
+  const allSelected =
+    licenses.length > 0 && selectedIds.size === licenses.length;
+
+  const toggleAll = () => {
+    if (allSelected) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(licenses.map((l) => l.id)));
+    }
+  };
+
+  const toggleOne = (id: string) => {
+    setSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  };
+
+  const handleBulkAction = async (action: string) => {
+    if (selectedIds.size === 0) return;
+    setBulkLoading(true);
+    setBulkError(null);
+    setBulkSuccess(null);
+
+    try {
+      const res = await fetch("/api/admin/licenses/bulk", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action,
+          licenseIds: Array.from(selectedIds),
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+
+      setBulkSuccess(
+        `${data.updated} license${data.updated !== 1 ? "s" : ""} updated successfully`
+      );
+      setSelectedIds(new Set());
+      router.refresh();
+    } catch (err: unknown) {
+      setBulkError(
+        err instanceof Error ? err.message : "Bulk action failed"
+      );
+    } finally {
+      setBulkLoading(false);
+    }
+  };
+
+  const handleExportCSV = async () => {
+    setExportLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (currentStatus !== "all") params.set("status", currentStatus);
+      if (currentPlan !== "all") params.set("plan", currentPlan);
+
+      const res = await fetch(`/api/admin/licenses/export?${params.toString()}`);
+      if (!res.ok) throw new Error("Export failed");
+
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `prowler-licenses-${new Date().toISOString().split("T")[0]}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error("Export error:", err);
+    } finally {
+      setExportLoading(false);
+    }
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,11 +178,11 @@ export function LicensesTable({
   const handleFilter = (key: string, value: string) => {
     const params = new URLSearchParams();
     if (search) params.set("search", search);
-    if (key !== "status")
-      params.set("status", currentStatus !== "all" ? currentStatus : "");
-    if (key !== "plan")
-      params.set("plan", currentPlan !== "all" ? currentPlan : "");
-    params.set(key, value);
+    if (key !== "status" && currentStatus !== "all")
+      params.set("status", currentStatus);
+    if (key !== "plan" && currentPlan !== "all")
+      params.set("plan", currentPlan);
+    if (value !== "all") params.set(key, value);
     router.push(`/admin/licenses?${params.toString()}`);
   };
 
@@ -114,13 +210,27 @@ export function LicensesTable({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="font-display font-bold text-2xl text-text-primary">
-          Licenses
-        </h1>
-        <p className="text-text-muted text-sm mt-1">
-          {licenses.length} license{licenses.length !== 1 ? "s" : ""} found
-        </p>
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div>
+          <h1 className="font-display font-bold text-2xl text-text-primary">
+            Licenses
+          </h1>
+          <p className="text-text-muted text-sm mt-1">
+            {licenses.length} license{licenses.length !== 1 ? "s" : ""} found
+          </p>
+        </div>
+        <button
+          onClick={handleExportCSV}
+          disabled={exportLoading}
+          className="flex items-center gap-2 px-4 py-2.5 bg-bg-surface border border-border rounded-xl text-text-secondary text-sm font-medium hover:border-border-glow hover:text-text-primary transition-all disabled:opacity-50"
+        >
+          {exportLoading ? (
+            <Loader2 size={14} className="animate-spin" />
+          ) : (
+            <Download size={14} />
+          )}
+          Export CSV
+        </button>
       </div>
 
       {/* Filters */}
@@ -147,7 +257,6 @@ export function LicensesTable({
           </button>
         </form>
 
-        {/* Status filter */}
         <div className="flex gap-2 overflow-x-auto">
           {["all", "active", "suspended", "expired", "revoked"].map((s) => (
             <button
@@ -164,7 +273,6 @@ export function LicensesTable({
           ))}
         </div>
 
-        {/* Plan filter */}
         <div className="flex gap-2">
           {["all", "basic", "pro", "elite"].map((p) => (
             <button
@@ -182,6 +290,78 @@ export function LicensesTable({
         </div>
       </div>
 
+      {/* Bulk actions bar */}
+      <AnimatePresence>
+        {selectedIds.size > 0 && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            className="flex flex-wrap items-center gap-3 bg-bg-surface border border-border-glow rounded-xl p-4"
+          >
+            <span className="text-text-primary text-sm font-medium">
+              {selectedIds.size} selected
+            </span>
+            <div className="w-px h-6 bg-border" />
+            {bulkActions.map(({ value, label, icon: Icon, color }) => (
+              <button
+                key={value}
+                onClick={() => handleBulkAction(value)}
+                disabled={bulkLoading}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all disabled:opacity-50 ${
+                  color === "accent-success"
+                    ? "bg-accent-success/10 border-accent-success/30 text-accent-success hover:bg-accent-success/20"
+                    : color === "accent-gold"
+                    ? "bg-accent-gold/10 border-accent-gold/30 text-accent-gold hover:bg-accent-gold/20"
+                    : color === "accent-hot"
+                    ? "bg-accent-hot/10 border-accent-hot/30 text-accent-hot hover:bg-accent-hot/20"
+                    : "bg-accent-primary/10 border-accent-primary/30 text-accent-primary hover:bg-accent-primary/20"
+                }`}
+              >
+                {bulkLoading ? (
+                  <Loader2 size={11} className="animate-spin" />
+                ) : (
+                  <Icon size={11} />
+                )}
+                {label}
+              </button>
+            ))}
+            <button
+              onClick={() => setSelectedIds(new Set())}
+              className="ml-auto text-text-muted text-xs hover:text-text-primary transition-colors"
+            >
+              Clear
+            </button>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Alerts */}
+      <AnimatePresence>
+        {bulkSuccess && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center gap-2 bg-accent-success/10 border border-accent-success/30 rounded-xl px-4 py-3"
+          >
+            <CheckCircle size={14} className="text-accent-success" />
+            <p className="text-accent-success text-sm">{bulkSuccess}</p>
+          </motion.div>
+        )}
+        {bulkError && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center gap-2 bg-accent-hot/10 border border-accent-hot/30 rounded-xl px-4 py-3"
+          >
+            <AlertCircle size={14} className="text-accent-hot" />
+            <p className="text-accent-hot text-sm">{bulkError}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
       {/* Table */}
       <div className="card-surface overflow-hidden">
         {licenses.length === 0 ? (
@@ -196,6 +376,18 @@ export function LicensesTable({
             <table className="w-full text-sm">
               <thead>
                 <tr className="border-b border-border bg-bg-elevated">
+                  <th className="p-4 w-10">
+                    <button
+                      onClick={toggleAll}
+                      className="text-text-muted hover:text-accent-primary transition-colors"
+                    >
+                      {allSelected ? (
+                        <CheckSquare size={16} className="text-accent-primary" />
+                      ) : (
+                        <Square size={16} />
+                      )}
+                    </button>
+                  </th>
                   {[
                     "Email",
                     "Plan",
@@ -224,6 +416,7 @@ export function LicensesTable({
                     ] || statusConfig.active;
                   const StatusIcon = sc.icon;
                   const isRevealed = revealedKeys.has(license.id);
+                  const isSelected = selectedIds.has(license.id);
 
                   return (
                     <motion.tr
@@ -231,8 +424,25 @@ export function LicensesTable({
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       transition={{ delay: i * 0.02 }}
-                      className="hover:bg-bg-elevated/50 transition-colors"
+                      className={`hover:bg-bg-elevated/50 transition-colors ${
+                        isSelected ? "bg-accent-primary/5" : ""
+                      }`}
                     >
+                      <td className="p-4 w-10">
+                        <button
+                          onClick={() => toggleOne(license.id)}
+                          className="text-text-muted hover:text-accent-primary transition-colors"
+                        >
+                          {isSelected ? (
+                            <CheckSquare
+                              size={16}
+                              className="text-accent-primary"
+                            />
+                          ) : (
+                            <Square size={16} />
+                          )}
+                        </button>
+                      </td>
                       <td className="p-4">
                         <p className="text-text-primary font-medium text-sm">
                           {license.email || "No email"}

@@ -15,6 +15,7 @@ import {
   X,
   Zap,
   ChevronRight,
+  Shield,
 } from "lucide-react";
 
 const navItems = [
@@ -44,6 +45,11 @@ const navItems = [
     href: "/admin/customers",
     label: "Customers",
     icon: Users,
+  },
+  {
+    href: "/admin/audit",
+    label: "Audit Log",
+    icon: Shield,
   },
 ];
 

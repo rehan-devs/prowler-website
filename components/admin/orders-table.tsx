@@ -10,6 +10,8 @@ import {
   XCircle,
   Eye,
   Filter,
+  Search,
+  AlertCircle,
 } from "lucide-react";
 
 interface Order {
@@ -51,7 +53,7 @@ const statusConfig = {
     bg: "bg-accent-hot/10 border-accent-hot/30",
   },
   refunded: {
-    icon: XCircle,
+    icon: AlertCircle,
     color: "text-text-muted",
     bg: "bg-bg-elevated border-border",
   },
@@ -60,11 +62,36 @@ const statusConfig = {
 export function OrdersTable({
   orders,
   currentStatus,
+  currentSearch,
 }: {
   orders: Order[];
   currentStatus: string;
+  currentSearch: string;
 }) {
   const router = useRouter();
+  const [search, setSearch] = useState(currentSearch);
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    const params = new URLSearchParams();
+    if (search.trim()) params.set("search", search.trim());
+    if (currentStatus !== "all") params.set("status", currentStatus);
+    router.push(`/admin/orders?${params.toString()}`);
+  };
+
+  const handleStatusFilter = (status: string) => {
+    const params = new URLSearchParams();
+    if (search.trim()) params.set("search", search.trim());
+    if (status !== "all") params.set("status", status);
+    router.push(`/admin/orders?${params.toString()}`);
+  };
+
+  const clearSearch = () => {
+    setSearch("");
+    const params = new URLSearchParams();
+    if (currentStatus !== "all") params.set("status", currentStatus);
+    router.push(`/admin/orders?${params.toString()}`);
+  };
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleDateString("en-US", {
@@ -77,29 +104,63 @@ export function OrdersTable({
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="font-display font-bold text-2xl text-text-primary">
-            Orders
-          </h1>
-          <p className="text-text-muted text-sm mt-1">
-            Review payment screenshots and approve licenses
-          </p>
-        </div>
+      <div>
+        <h1 className="font-display font-bold text-2xl text-text-primary">
+          Orders
+        </h1>
+        <p className="text-text-muted text-sm mt-1">
+          Review payment screenshots and approve licenses
+        </p>
       </div>
+
+      {/* Search bar */}
+      <form onSubmit={handleSearch} className="flex gap-2">
+        <div className="flex-1 relative">
+          <Search
+            size={14}
+            className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+          />
+          <input
+            type="text"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            placeholder="Search by name or email..."
+            className="w-full bg-bg-surface border border-border rounded-xl pl-9 pr-4 py-2.5 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors"
+          />
+        </div>
+        <button
+          type="submit"
+          className="px-4 py-2.5 bg-accent-primary/15 border border-accent-primary/30 text-accent-primary rounded-xl text-sm font-medium hover:bg-accent-primary/25 transition-all"
+        >
+          Search
+        </button>
+        {currentSearch && (
+          <button
+            type="button"
+            onClick={clearSearch}
+            className="px-3 py-2.5 border border-border rounded-xl text-text-muted text-sm hover:text-text-primary hover:border-border-glow transition-all"
+          >
+            Clear
+          </button>
+        )}
+      </form>
+
+      {/* Current search indicator */}
+      {currentSearch && (
+        <div className="flex items-center gap-2 bg-accent-primary/10 border border-accent-primary/30 rounded-xl px-4 py-2">
+          <Search size={12} className="text-accent-primary" />
+          <span className="text-accent-primary text-sm">
+            Showing results for &ldquo;{currentSearch}&rdquo;
+          </span>
+        </div>
+      )}
 
       {/* Status tabs */}
       <div className="flex gap-2 overflow-x-auto pb-1">
         {statusTabs.map((tab) => (
           <button
             key={tab.value}
-            onClick={() =>
-              router.push(
-                tab.value === "all"
-                  ? "/admin/orders"
-                  : `/admin/orders?status=${tab.value}`
-              )
-            }
+            onClick={() => handleStatusFilter(tab.value)}
             className={`px-4 py-2 rounded-xl text-sm font-medium whitespace-nowrap transition-all ${
               currentStatus === tab.value
                 ? "bg-accent-primary/15 text-accent-primary border border-accent-primary/30"
@@ -118,7 +179,9 @@ export function OrdersTable({
             <Filter size={32} className="text-text-muted mx-auto mb-3" />
             <p className="text-text-secondary font-medium">No orders found</p>
             <p className="text-text-muted text-sm mt-1">
-              {currentStatus === "pending"
+              {currentSearch
+                ? `No orders match "${currentSearch}".`
+                : currentStatus === "pending"
                 ? "No pending orders right now."
                 : "No orders match this filter."}
             </p>
