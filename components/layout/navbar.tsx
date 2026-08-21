@@ -15,13 +15,29 @@ const navItems = [
 
 export function Navbar() {
   const pathname = usePathname();
+
   if (pathname.startsWith("/admin")) return null;
+
+  const handleItemClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string, title: string) => {
+    // If the user clicks 'Home' and is already on the home page, smoothly scroll to top
+    if (title === 'Home' && pathname === '/') {
+      e.preventDefault();
+      window.scrollTo({
+        top: 0,
+        behavior: "smooth"
+      });
+    }
+  };
 
   return (
     <div className='fixed bottom-6 left-1/2 z-50 max-w-full -translate-x-1/2'>
       <Dock className='items-end pb-3'>
         {navItems.map((item, idx) => (
-          <Link href={item.href} key={idx}>
+          <Link 
+            href={item.href} 
+            key={idx}
+            onClick={(e) => handleItemClick(e, item.href, item.title)} // ← Intercepts clicking Home
+          >
             <DockItem className={`aspect-square rounded-full transition-colors ${
               item.isPrimary ? 'bg-accent text-white' : 'bg-background hover:bg-foreground/5 text-foreground'
             }`}>
