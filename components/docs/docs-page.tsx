@@ -3,88 +3,34 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  BookOpen,
+  Play,
   Download,
   Key,
-  Play,
+  Search,
   Globe,
   User,
   Brain,
   FileDown,
   HelpCircle,
-  ChevronRight,
-  Terminal,
   Monitor,
   Apple,
-  Search,
+  Terminal,
+  Check,
+  ChevronRight,
+  AlertCircle,
+  BookOpen,
 } from "lucide-react";
+import { InlineAnnotation } from "@/components/ui/visual-anchors";
 
-const sections = [
-  {
-    id: "getting-started",
-    label: "Getting Started",
-    icon: Play,
-    content: GettingStarted,
-  },
-  {
-    id: "installation",
-    label: "Installation",
-    icon: Download,
-    content: Installation,
-  },
-  {
-    id: "activation",
-    label: "License Activation",
-    icon: Key,
-    content: Activation,
-  },
-  {
-    id: "first-scrape",
-    label: "Your First Scrape",
-    icon: Search,
-    content: FirstScrape,
-  },
-  {
-    id: "directory-scraping",
-    label: "Directory Scraping",
-    icon: Globe,
-    content: DirectoryScraping,
-  },
-  {
-    id: "owner-enrichment",
-    label: "Owner Enrichment",
-    icon: User,
-    content: OwnerEnrichment,
-  },
-  {
-    id: "ai-configuration",
-    label: "AI Configuration",
-    icon: Brain,
-    content: AiConfiguration,
-  },
-  {
-    id: "export",
-    label: "Exporting Data",
-    icon: FileDown,
-    content: ExportData,
-  },
-  {
-    id: "troubleshooting",
-    label: "Troubleshooting",
-    icon: HelpCircle,
-    content: Troubleshooting,
-  },
-];
+/* ---------------- UI PRIMITIVES ---------------- */
 
 function DocSection({ children }: { children: React.ReactNode }) {
-  return (
-    <div className="prose prose-invert max-w-none space-y-6">{children}</div>
-  );
+  return <div className="space-y-6">{children}</div>;
 }
 
 function DocH2({ children }: { children: React.ReactNode }) {
   return (
-    <h2 className="font-display font-bold text-2xl text-text-primary mt-8 mb-4 first:mt-0">
+    <h2 className="font-display font-black text-2xl text-foreground tracking-tight border-b border-border/60 pb-3 mt-10 first:mt-0">
       {children}
     </h2>
   );
@@ -92,7 +38,7 @@ function DocH2({ children }: { children: React.ReactNode }) {
 
 function DocH3({ children }: { children: React.ReactNode }) {
   return (
-    <h3 className="font-display font-semibold text-lg text-text-primary mt-6 mb-3">
+    <h3 className="font-display font-black text-lg text-foreground tracking-tight mt-6 mb-3">
       {children}
     </h3>
   );
@@ -100,13 +46,15 @@ function DocH3({ children }: { children: React.ReactNode }) {
 
 function DocP({ children }: { children: React.ReactNode }) {
   return (
-    <p className="text-text-secondary leading-relaxed text-sm">{children}</p>
+    <p className="text-muted text-sm font-medium leading-relaxed">
+      {children}
+    </p>
   );
 }
 
 function DocCode({ children }: { children: React.ReactNode }) {
   return (
-    <code className="bg-bg-elevated border border-border px-2 py-0.5 rounded text-accent-primary text-xs font-mono">
+    <code className="bg-white border border-border px-1.5 py-0.5 rounded font-mono text-accent text-xs font-bold">
       {children}
     </code>
   );
@@ -114,7 +62,7 @@ function DocCode({ children }: { children: React.ReactNode }) {
 
 function DocBlock({ children }: { children: React.ReactNode }) {
   return (
-    <pre className="bg-bg-elevated border border-border rounded-xl p-4 overflow-x-auto text-xs font-mono text-text-secondary leading-relaxed">
+    <pre className="bg-white border border-border rounded-xl p-4 overflow-x-auto font-mono text-xs text-foreground font-bold leading-relaxed">
       {children}
     </pre>
   );
@@ -130,13 +78,17 @@ function DocStep({
   children: React.ReactNode;
 }) {
   return (
-    <div className="flex gap-4">
-      <div className="w-7 h-7 rounded-full bg-accent-primary/20 text-accent-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
+    <div className="flex gap-4 items-start">
+      <div className="w-7 h-7 rounded-full bg-accent text-white text-xs font-bold flex items-center justify-center shrink-0 mt-0.5">
         {number}
       </div>
-      <div>
-        <p className="text-text-primary font-semibold text-sm mb-1">{title}</p>
-        <div className="text-text-secondary text-sm">{children}</div>
+      <div className="flex-1">
+        <h4 className="text-foreground font-black text-sm tracking-tight mb-1">
+          {title}
+        </h4>
+        <div className="text-muted text-sm font-medium leading-relaxed">
+          {children}
+        </div>
       </div>
     </div>
   );
@@ -150,16 +102,24 @@ function DocAlert({
   children: React.ReactNode;
 }) {
   const styles = {
-    info: "bg-accent-primary/10 border-accent-primary/30 text-accent-primary",
-    warning: "bg-accent-gold/10 border-accent-gold/30 text-accent-gold",
-    success: "bg-accent-success/10 border-accent-success/30 text-accent-success",
+    info: "bg-accent/5 border-accent/20 text-foreground",
+    warning: "bg-amber-50 border-amber-200 text-amber-950",
+    success: "bg-emerald-50 border-emerald-200 text-emerald-950",
+  };
+  const iconColor = {
+    info: "text-accent",
+    warning: "text-amber-800",
+    success: "text-emerald-700",
   };
   return (
-    <div className={`border rounded-xl p-4 text-sm ${styles[type]}`}>
-      {children}
+    <div className={`border rounded-xl p-4 flex gap-3 items-start ${styles[type]}`}>
+      <AlertCircle size={16} className={`shrink-0 mt-0.5 ${iconColor[type]}`} />
+      <div className="text-xs font-bold leading-normal">{children}</div>
     </div>
   );
 }
+
+/* ---------------- SECTIONS ---------------- */
 
 function GettingStarted() {
   return (
@@ -175,29 +135,14 @@ function GettingStarted() {
       <DocH3>System Requirements</DocH3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {[
-          {
-            icon: Monitor,
-            os: "Windows",
-            req: "Windows 10 or 11, 64-bit",
-          },
-          {
-            icon: Apple,
-            os: "macOS",
-            req: "macOS 12 Monterey or later",
-          },
-          {
-            icon: Terminal,
-            os: "Linux",
-            req: "Ubuntu 20.04+ or Debian 11+",
-          },
+          { icon: Monitor, os: "Windows", req: "Windows 10 or 11, 64-bit" },
+          { icon: Apple, os: "macOS", req: "macOS 12 Monterey or later" },
+          { icon: Terminal, os: "Linux", req: "Ubuntu 20.04+ or Debian 11+" },
         ].map(({ icon: Icon, os, req }) => (
-          <div
-            key={os}
-            className="bg-bg-elevated border border-border rounded-xl p-4"
-          >
-            <Icon size={18} className="text-accent-primary mb-2" />
-            <p className="text-text-primary font-semibold text-sm">{os}</p>
-            <p className="text-text-muted text-xs mt-1">{req}</p>
+          <div key={os} className="bg-white border border-border rounded-xl p-5 shadow-sm">
+            <Icon size={18} className="text-accent mb-3" />
+            <p className="text-foreground font-black text-sm tracking-tight">{os}</p>
+            <p className="text-muted text-xs font-bold mt-1 uppercase tracking-wider">{req}</p>
           </div>
         ))}
       </div>
@@ -205,12 +150,7 @@ function GettingStarted() {
       <DocAlert type="warning">
         Python 3.12 is required on all platforms. The scraping engine runs on
         Python. Install it from{" "}
-        <a
-          href="https://python.org"
-          className="underline"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
+        <a href="https://python.org" className="underline" target="_blank" rel="noopener noreferrer">
           python.org
         </a>{" "}
         before installing Prowler.io.
@@ -220,7 +160,7 @@ function GettingStarted() {
       <div className="space-y-4">
         <DocStep number={1} title="Purchase a license">
           Go to the{" "}
-          <a href="/pricing" className="text-accent-primary hover:underline">
+          <a href="/pricing" className="text-accent hover:underline font-bold">
             Pricing page
           </a>
           , choose your plan, and complete the payment.
@@ -232,11 +172,11 @@ function GettingStarted() {
         </DocStep>
         <DocStep number={3} title="Install Python 3.12">
           Download and install Python 3.12 from python.org. Make sure to check
-          "Add Python to PATH" during installation on Windows.
+          &quot;Add Python to PATH&quot; during installation on Windows.
         </DocStep>
         <DocStep number={4} title="Install Prowler.io">
           Download the installer for your OS from the{" "}
-          <a href="/download" className="text-accent-primary hover:underline">
+          <a href="/download" className="text-accent hover:underline font-bold">
             Download page
           </a>{" "}
           and run it.
@@ -264,41 +204,36 @@ function Installation() {
       </DocP>
 
       <div className="space-y-4">
-        <div className="bg-bg-elevated border border-border rounded-xl p-4">
+        <div className="bg-white border border-border rounded-xl p-5">
           <div className="flex items-center gap-2 mb-3">
-            <Monitor size={14} className="text-accent-primary" />
-            <p className="text-text-primary font-semibold text-sm">Windows</p>
+            <Monitor size={14} className="text-accent" />
+            <p className="text-foreground font-black text-sm tracking-tight">Windows</p>
           </div>
-          <ol className="space-y-2 text-text-secondary text-sm">
+          <ol className="space-y-2 text-muted text-sm font-medium leading-relaxed mb-3">
             <li>1. Download Python 3.12 from python.org/downloads</li>
             <li>2. Run the installer</li>
-            <li>
-              3. Check the box "Add Python 3.12 to PATH" before clicking
-              Install
-            </li>
-            <li>
-              4. Verify installation — open Command Prompt and run:
-            </li>
+            <li>3. Check the box &quot;Add Python 3.12 to PATH&quot; before clicking Install</li>
+            <li>4. Verify installation — open Command Prompt and run:</li>
           </ol>
           <DocBlock>python --version</DocBlock>
         </div>
 
-        <div className="bg-bg-elevated border border-border rounded-xl p-4">
+        <div className="bg-white border border-border rounded-xl p-5">
           <div className="flex items-center gap-2 mb-3">
-            <Apple size={14} className="text-accent-primary" />
-            <p className="text-text-primary font-semibold text-sm">macOS</p>
+            <Apple size={14} className="text-accent" />
+            <p className="text-foreground font-black text-sm tracking-tight">macOS</p>
           </div>
-          <DocP>
-            Install via Homebrew (recommended) or the official installer:
-          </DocP>
-          <DocBlock>{`brew install python@3.12
+          <DocP>Install via Homebrew (recommended) or the official installer:</DocP>
+          <div className="mt-3">
+            <DocBlock>{`brew install python@3.12
 python3.12 --version`}</DocBlock>
+          </div>
         </div>
 
-        <div className="bg-bg-elevated border border-border rounded-xl p-4">
+        <div className="bg-white border border-border rounded-xl p-5">
           <div className="flex items-center gap-2 mb-3">
-            <Terminal size={14} className="text-accent-primary" />
-            <p className="text-text-primary font-semibold text-sm">Linux</p>
+            <Terminal size={14} className="text-accent" />
+            <p className="text-foreground font-black text-sm tracking-tight">Linux</p>
           </div>
           <DocBlock>{`sudo apt update
 sudo apt install python3.12 python3.12-venv python3.12-pip
@@ -339,12 +274,12 @@ python3.12 --version`}</DocBlock>
             ],
           },
         ].map(({ os, steps }) => (
-          <div key={os} className="bg-bg-elevated border border-border rounded-xl p-4">
-            <p className="text-text-primary font-semibold text-sm mb-3">{os}</p>
-            <ol className="space-y-1.5">
+          <div key={os} className="bg-white border border-border rounded-xl p-5">
+            <p className="text-foreground font-black text-sm mb-3 tracking-tight">{os}</p>
+            <ol className="space-y-2">
               {steps.map((step, i) => (
-                <li key={i} className="text-text-secondary text-sm flex gap-2">
-                  <span className="text-accent-primary font-mono text-xs mt-0.5 flex-shrink-0">
+                <li key={i} className="text-muted text-sm font-medium flex gap-3">
+                  <span className="text-accent font-mono text-xs mt-0.5 flex-shrink-0 font-bold">
                     {i + 1}.
                   </span>
                   {step}
@@ -399,10 +334,7 @@ function Activation() {
         If you have an Unlimited Devices plan, you can activate on any number of
         machines. If you have a 1 Device plan and need to switch machines,
         contact us at{" "}
-        <a
-          href="mailto:support@prowler.io"
-          className="text-accent-primary hover:underline"
-        >
+        <a href="mailto:support@prowler.io" className="text-accent hover:underline font-bold">
           support@prowler.io
         </a>{" "}
         with your license key and we will reset it.
@@ -428,9 +360,9 @@ function Activation() {
             fix: "Check your internet connection. Disable any VPN or firewall that may be blocking the connection.",
           },
         ].map(({ error, fix }) => (
-          <div key={error} className="bg-bg-elevated border border-border rounded-xl p-4">
-            <p className="text-accent-hot text-sm font-medium mb-1">{error}</p>
-            <p className="text-text-secondary text-sm">{fix}</p>
+          <div key={error} className="bg-white border border-border rounded-xl p-5">
+            <p className="text-foreground text-sm font-black mb-1 tracking-tight">{error}</p>
+            <p className="text-muted text-sm font-medium leading-relaxed">{fix}</p>
           </div>
         ))}
       </div>
@@ -453,8 +385,8 @@ function FirstScrape() {
           at the top.
         </DocStep>
         <DocStep number={2} title="Enter search criteria">
-          Fill in the search fields: Business Type (e.g., "plumber"), Location
-          (e.g., "Houston, TX"), and the number of results you want.
+          Fill in the search fields: Business Type (e.g., &quot;plumber&quot;), Location
+          (e.g., &quot;Houston, TX&quot;), and the number of results you want.
         </DocStep>
         <DocStep number={3} title="Configure filters (optional)">
           You can filter by rating, number of reviews, whether the business has
@@ -496,9 +428,9 @@ function FirstScrape() {
         ].map((item) => (
           <div
             key={item}
-            className="bg-bg-elevated border border-border rounded-lg px-3 py-2 text-text-secondary text-xs flex items-center gap-2"
+            className="bg-white border border-border rounded-lg px-3 py-2 text-muted text-xs font-bold flex items-center gap-2"
           >
-            <div className="w-1.5 h-1.5 rounded-full bg-accent-primary flex-shrink-0" />
+            <div className="w-1.5 h-1.5 rounded-full bg-accent flex-shrink-0" />
             {item}
           </div>
         ))}
@@ -518,7 +450,7 @@ function DirectoryScraping() {
 
       <DocAlert type="warning">
         Only use this feature with directories you have legitimate access to.
-        Respect each website's terms of service.
+        Respect each website&apos;s terms of service.
       </DocAlert>
 
       <DocH3>Supported Directories (Built-in)</DocH3>
@@ -539,9 +471,9 @@ function DirectoryScraping() {
         ].map((dir) => (
           <div
             key={dir}
-            className="bg-bg-elevated border border-border rounded-lg px-3 py-2 text-text-secondary text-xs flex items-center gap-2"
+            className="bg-white border border-border rounded-lg px-3 py-2 text-muted text-xs font-bold flex items-center gap-2"
           >
-            <Globe size={10} className="text-accent-primary flex-shrink-0" />
+            <Globe size={10} className="text-accent flex-shrink-0" />
             {dir}
           </div>
         ))}
@@ -585,42 +517,22 @@ function OwnerEnrichment() {
       <DocH3>What It Finds</DocH3>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
         {[
-          {
-            source: "LinkedIn",
-            data: "Owner name, job title, LinkedIn profile URL",
-          },
-          {
-            source: "Facebook",
-            data: "Personal or business Facebook page",
-          },
-          {
-            source: "Instagram",
-            data: "Business Instagram handle",
-          },
-          {
-            source: "State Registries",
-            data: "Registered agent name, business address",
-          },
-          {
-            source: "Website",
-            data: "Team page, About page, contact email",
-          },
-          {
-            source: "Domain WHOIS",
-            data: "Registrant name and email (when public)",
-          },
+          { source: "LinkedIn", data: "Owner name, job title, LinkedIn profile URL" },
+          { source: "Facebook", data: "Personal or business Facebook page" },
+          { source: "Instagram", data: "Business Instagram handle" },
+          { source: "State Registries", data: "Registered agent name, business address" },
+          { source: "Website", data: "Team page, About page, contact email" },
+          { source: "Domain WHOIS", data: "Registrant name and email (when public)" },
         ].map(({ source, data }) => (
-          <div key={source} className="bg-bg-elevated border border-border rounded-xl p-4">
-            <p className="text-text-primary font-semibold text-sm mb-1">
-              {source}
-            </p>
-            <p className="text-text-muted text-xs">{data}</p>
+          <div key={source} className="bg-white border border-border rounded-xl p-4">
+            <p className="text-foreground font-black text-sm mb-1 tracking-tight">{source}</p>
+            <p className="text-muted text-xs font-medium leading-relaxed">{data}</p>
           </div>
         ))}
       </div>
 
       <DocH3>Running Enrichment</DocH3>
-      <div className="space-y-3">
+      <div className="space-y-4">
         <DocStep number={1} title="Complete a scrape job">
           Run any standard scrape to get your initial lead list.
         </DocStep>
@@ -655,7 +567,7 @@ function AiConfiguration() {
       </DocP>
 
       <DocH3>Setting Up OpenAI</DocH3>
-      <div className="space-y-3">
+      <div className="space-y-4">
         <DocStep number={1} title="Get an API key">
           Go to platform.openai.com, create an account, and generate an API key.
         </DocStep>
@@ -668,7 +580,7 @@ function AiConfiguration() {
       </div>
 
       <DocH3>Setting Up Claude (Anthropic)</DocH3>
-      <div className="space-y-3">
+      <div className="space-y-4">
         <DocStep number={1} title="Get an API key">
           Go to console.anthropic.com and generate an API key.
         </DocStep>
@@ -717,18 +629,16 @@ function ExportData() {
             best: "Best for: Developers",
           },
         ].map(({ format, desc, best }) => (
-          <div key={format} className="bg-bg-elevated border border-border rounded-xl p-4">
-            <p className="text-text-primary font-bold text-lg mb-1">
-              {format}
-            </p>
-            <p className="text-text-secondary text-xs mb-2">{desc}</p>
-            <p className="text-accent-primary text-xs">{best}</p>
+          <div key={format} className="bg-white border border-border rounded-xl p-5">
+            <p className="text-foreground font-black text-xl mb-2 tracking-tight">{format}</p>
+            <p className="text-muted text-xs font-medium mb-3 leading-relaxed">{desc}</p>
+            <p className="text-accent text-[10px] font-black uppercase tracking-widest">{best}</p>
           </div>
         ))}
       </div>
 
       <DocH3>How to Export</DocH3>
-      <div className="space-y-3">
+      <div className="space-y-4">
         <DocStep number={1} title="Complete a scrape job">
           Wait for the job to finish or stop it manually when you have enough
           leads.
@@ -803,15 +713,12 @@ function Troubleshooting() {
             ],
           },
         ].map(({ problem, solutions }) => (
-          <div key={problem} className="card-surface p-5">
-            <p className="text-text-primary font-semibold mb-3">{problem}</p>
+          <div key={problem} className="bg-white border border-border rounded-xl p-5 shadow-sm">
+            <p className="text-foreground font-black text-sm mb-3 tracking-tight">{problem}</p>
             <ul className="space-y-2">
               {solutions.map((s, i) => (
-                <li key={i} className="flex items-start gap-2 text-text-secondary text-sm">
-                  <ChevronRight
-                    size={12}
-                    className="text-accent-primary mt-0.5 flex-shrink-0"
-                  />
+                <li key={i} className="flex items-start gap-2 text-muted text-sm font-medium leading-relaxed">
+                  <ChevronRight size={14} className="text-accent mt-0.5 flex-shrink-0" />
                   {s}
                 </li>
               ))}
@@ -823,10 +730,7 @@ function Troubleshooting() {
       <DocH3>Still Need Help?</DocH3>
       <DocP>
         Contact our support team at{" "}
-        <a
-          href="mailto:support@prowler.io"
-          className="text-accent-primary hover:underline"
-        >
+        <a href="mailto:support@prowler.io" className="text-accent hover:underline font-bold">
           support@prowler.io
         </a>
         . Include your OS, Prowler version, and a description of the problem.
@@ -836,20 +740,71 @@ function Troubleshooting() {
   );
 }
 
+/* ---------------- SECTIONS REGISTRY ---------------- */
+
+const sections = [
+  { id: "getting-started", label: "Getting Started", icon: Play, content: GettingStarted },
+  { id: "installation", label: "Installation", icon: Download, content: Installation },
+  { id: "activation", label: "License Activation", icon: Key, content: Activation },
+  { id: "first-scrape", label: "Your First Scrape", icon: Search, content: FirstScrape },
+  { id: "directory-scraping", label: "Directory Scraping", icon: Globe, content: DirectoryScraping },
+  { id: "owner-enrichment", label: "Owner Enrichment", icon: User, content: OwnerEnrichment },
+  { id: "ai-configuration", label: "AI Configuration", icon: Brain, content: AiConfiguration },
+  { id: "export", label: "Exporting Data", icon: FileDown, content: ExportData },
+  { id: "troubleshooting", label: "Troubleshooting", icon: HelpCircle, content: Troubleshooting },
+];
+
+/* ---------------- MAIN PAGE ---------------- */
+
 export function DocsPage() {
   const [activeSection, setActiveSection] = useState("getting-started");
   const current = sections.find((s) => s.id === activeSection)!;
   const ContentComponent = current.content;
 
   return (
-    <div className="min-h-screen pt-20">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex gap-8">
+    <div className="min-h-screen pt-32 pb-24 bg-background relative overflow-hidden">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
+        {/* Page Hero */}
+        <div className="mb-16 border-b border-border pb-10 relative">
+          <div className="flex items-center gap-2 mb-4">
+            <BookOpen size={14} className="text-accent" />
+            <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted">
+              Product Knowledge Base
+            </span>
+          </div>
+          <h1 className="text-display-sm md:text-display-md font-display font-black text-foreground tracking-tight leading-none">
+            Technical{" "}
+            <span className="relative inline-block">
+              guides
+              <span className="hidden md:block absolute top-0 right-0 w-0 h-0">
+                <InlineAnnotation
+                  text="everything you need"
+                  delay={0.6}
+                  path="M 0,0 Q 45,-40 105,-18"
+                  svgStyles={{ top: "5%", left: "80%" }}
+                  textStyles={{
+                    top: "-12px",
+                    left: "115px",
+                    transform: "rotate(5deg)",
+                  }}
+                />
+              </span>
+            </span>{" "}
+            &amp; <span className="accent-block">tutorials.</span>
+          </h1>
+          <p className="text-muted text-base font-medium mt-6 max-w-2xl">
+            Everything you need to install, activate and master Prowler.io — from a first-time scrape to advanced enrichment configurations.
+          </p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8 items-start">
+          
           {/* Sidebar */}
-          <aside className="hidden md:block w-56 flex-shrink-0 py-12">
-            <div className="sticky top-24">
-              <p className="text-text-muted text-xs uppercase tracking-widest mb-4 px-3">
-                Documentation
+          <aside className="w-full lg:w-64 shrink-0 lg:sticky lg:top-24">
+            <div className="bg-white border border-border rounded-2xl p-4 shadow-sm">
+              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted px-3 mb-3 mt-1">
+                Contents
               </p>
               <nav className="space-y-1">
                 {sections.map((section) => {
@@ -859,10 +814,10 @@ export function DocsPage() {
                     <button
                       key={section.id}
                       onClick={() => setActiveSection(section.id)}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all text-left ${
+                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-bold tracking-wide transition-all text-left ${
                         isActive
-                          ? "bg-accent-primary/15 text-accent-primary"
-                          : "text-text-secondary hover:text-text-primary hover:bg-bg-elevated"
+                          ? "bg-accent text-white"
+                          : "text-muted hover:text-foreground hover:bg-background/70"
                       }`}
                     >
                       <Icon size={14} />
@@ -872,42 +827,96 @@ export function DocsPage() {
                 })}
               </nav>
             </div>
+
+            {/* Support Card */}
+            <div className="mt-4 bg-inverted border border-inverted rounded-2xl p-6 text-inverted-foreground">
+              <p className="text-[10px] font-bold uppercase tracking-widest text-inverted-muted mb-2">
+                Need help?
+              </p>
+              <p className="font-display font-black text-lg tracking-tight mb-3 leading-tight">
+                Talk to a real human.
+              </p>
+              <a
+                href="/support"
+                className="inline-block text-xs font-black uppercase text-accent hover:underline tracking-widest"
+              >
+                Contact Support &rarr;
+              </a>
+            </div>
           </aside>
 
-          {/* Mobile section picker */}
-          <div className="md:hidden w-full pt-6 pb-2">
-            <select
-              value={activeSection}
-              onChange={(e) => setActiveSection(e.target.value)}
-              className="w-full bg-bg-surface border border-border rounded-xl px-4 py-3 text-text-primary text-sm focus:outline-none focus:border-accent-primary"
-            >
-              {sections.map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.label}
-                </option>
-              ))}
-            </select>
-          </div>
-
           {/* Content */}
-          <main className="flex-1 py-12 min-w-0">
+          <main className="flex-1 min-w-0 bg-white border border-border rounded-2xl p-8 md:p-12 shadow-sm">
             <AnimatePresence mode="wait">
               <motion.div
                 key={activeSection}
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
-                transition={{ duration: 0.2 }}
+                transition={{ duration: 0.25 }}
               >
-                <div className="mb-8">
-                  <h1 className="font-display font-bold text-3xl text-text-primary">
-                    {current.label}
-                  </h1>
+                <div className="mb-8 pb-6 border-b border-border/60 flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+                    <current.icon size={20} className="text-accent" />
+                  </div>
+                  <div>
+                    <span className="text-[10px] font-bold uppercase tracking-widest text-accent mb-1 block">
+                      Prowler Docs
+                    </span>
+                    <h2 className="font-display font-black text-2xl md:text-3xl text-foreground tracking-tight leading-none">
+                      {current.label}
+                    </h2>
+                  </div>
                 </div>
+
                 <ContentComponent />
+
+                {/* Nav between sections */}
+                <div className="mt-16 pt-8 border-t border-border/60 flex items-center justify-between gap-4">
+                  {(() => {
+                    const currentIdx = sections.findIndex((s) => s.id === activeSection);
+                    const prev = sections[currentIdx - 1];
+                    const next = sections[currentIdx + 1];
+                    return (
+                      <>
+                        {prev ? (
+                          <button
+                            onClick={() => setActiveSection(prev.id)}
+                            className="group flex flex-col items-start gap-1 text-left"
+                          >
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted">
+                              &larr; Previous
+                            </span>
+                            <span className="text-sm font-black text-foreground group-hover:text-accent transition-colors tracking-tight">
+                              {prev.label}
+                            </span>
+                          </button>
+                        ) : (
+                          <div />
+                        )}
+                        {next ? (
+                          <button
+                            onClick={() => setActiveSection(next.id)}
+                            className="group flex flex-col items-end gap-1 text-right"
+                          >
+                            <span className="text-[10px] font-bold uppercase tracking-widest text-muted">
+                              Next &rarr;
+                            </span>
+                            <span className="text-sm font-black text-foreground group-hover:text-accent transition-colors tracking-tight">
+                              {next.label}
+                            </span>
+                          </button>
+                        ) : (
+                          <div />
+                        )}
+                      </>
+                    );
+                  })()}
+                </div>
               </motion.div>
             </AnimatePresence>
           </main>
+
         </div>
       </div>
     </div>

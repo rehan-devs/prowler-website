@@ -8,7 +8,7 @@ export default function Terms() {
       <Navbar />
       <LegalPage
         title="Terms of Service"
-        lastUpdated="January 2025"
+        lastUpdated="August 2026"
         sections={termsContent}
       />
       <Footer />

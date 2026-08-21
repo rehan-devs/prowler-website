@@ -40,31 +40,31 @@ interface License {
 const statusConfig = {
   active: {
     icon: CheckCircle,
-    color: "text-accent-success",
-    bg: "bg-accent-success/10 border-accent-success/20",
+    color: "text-emerald-600",
+    bg: "bg-emerald-500/10 border-emerald-500/20",
   },
   suspended: {
     icon: Ban,
-    color: "text-accent-gold",
-    bg: "bg-accent-gold/10 border-accent-gold/20",
+    color: "text-amber-600",
+    bg: "bg-amber-500/10 border-amber-500/20",
   },
   expired: {
     icon: Clock,
-    color: "text-text-muted",
-    bg: "bg-bg-elevated border-border",
+    color: "text-muted",
+    bg: "bg-white border-border",
   },
   revoked: {
     icon: XCircle,
-    color: "text-accent-hot",
-    bg: "bg-accent-hot/10 border-accent-hot/20",
+    color: "text-red-600",
+    bg: "bg-red-500/10 border-red-500/20",
   },
 };
 
 const bulkActions = [
-  { value: "activate", label: "Activate Selected", icon: CheckCircle, color: "accent-success" },
-  { value: "suspend", label: "Suspend Selected", icon: Ban, color: "accent-gold" },
-  { value: "revoke", label: "Revoke Selected", icon: XCircle, color: "accent-hot" },
-  { value: "reset_hardware", label: "Reset Hardware", icon: RefreshCw, color: "accent-primary" },
+  { value: "activate", label: "Activate Selected", icon: CheckCircle, color: "emerald" },
+  { value: "suspend", label: "Suspend Selected", icon: Ban, color: "amber" },
+  { value: "revoke", label: "Revoke Selected", icon: XCircle, color: "red" },
+  { value: "reset_hardware", label: "Reset Hardware ID", icon: RefreshCw, color: "accent" },
 ];
 
 export function LicensesTable({
@@ -127,13 +127,13 @@ export function LicensesTable({
       if (!res.ok) throw new Error(data.error);
 
       setBulkSuccess(
-        `${data.updated} license${data.updated !== 1 ? "s" : ""} updated successfully`
+        `${data.updated} license record${data.updated !== 1 ? "s" : ""} modified successfully.`
       );
       setSelectedIds(new Set());
       router.refresh();
     } catch (err: unknown) {
       setBulkError(
-        err instanceof Error ? err.message : "Bulk action failed"
+        err instanceof Error ? err.message : "Bulk adjustment action failed"
       );
     } finally {
       setBulkLoading(false);
@@ -204,149 +204,153 @@ export function LicensesTable({
     });
   };
 
-  const maskedHash = (hash: string) =>
-    `${hash.slice(0, 8)}...${hash.slice(-6)}`;
-
   return (
     <div className="space-y-6">
+      
       {/* Header */}
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-text-primary">
-            Licenses
+          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-3">
+            Operational Records
+          </span>
+          <h1 className="text-2xl font-display font-black text-foreground tracking-tight flex items-center gap-3">
+            <Key size={20} className="text-accent" />
+            Active Licenses
           </h1>
-          <p className="text-text-muted text-sm mt-1">
-            {licenses.length} license{licenses.length !== 1 ? "s" : ""} found
+          <p className="text-muted text-xs font-bold uppercase tracking-widest mt-1">
+            {licenses.length} matching license records detected
           </p>
         </div>
         <button
           onClick={handleExportCSV}
           disabled={exportLoading}
-          className="flex items-center gap-2 px-4 py-2.5 bg-bg-surface border border-border rounded-xl text-text-secondary text-sm font-medium hover:border-border-glow hover:text-text-primary transition-all disabled:opacity-50"
+          className="flex items-center justify-center gap-2 px-5 py-3 border border-border hover:border-accent hover:text-accent rounded-full text-xs font-black uppercase tracking-wider bg-white transition-colors"
         >
           {exportLoading ? (
-            <Loader2 size={14} className="animate-spin" />
+            <Loader2 size={13} className="animate-spin" />
           ) : (
-            <Download size={14} />
+            <Download size={13} />
           )}
-          Export CSV
+          Export CSV Database
         </button>
       </div>
 
-      {/* Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      {/* Filter panel */}
+      <div className="flex flex-col lg:flex-row gap-4 items-stretch">
         <form onSubmit={handleSearch} className="flex-1 flex gap-2">
           <div className="flex-1 relative">
             <Search
               size={14}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted"
+              className="absolute left-4 top-1/2 -translate-y-1/2 text-muted"
             />
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by email or notes..."
-              className="w-full bg-bg-surface border border-border rounded-xl pl-9 pr-4 py-2.5 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors"
+              placeholder="Search by client email, notes description..."
+              className="w-full bg-white border border-border rounded-xl pl-10 pr-4 py-3 text-foreground text-xs font-bold placeholder:text-muted focus:outline-none focus:border-accent transition-colors shadow-xs"
             />
           </div>
           <button
             type="submit"
-            className="px-4 py-2.5 bg-accent-primary/15 border border-accent-primary/30 text-accent-primary rounded-xl text-sm font-medium hover:bg-accent-primary/25 transition-all"
+            className="px-6 py-3 bg-accent text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#4F52D6] transition-all"
           >
             Search
           </button>
         </form>
 
-        <div className="flex gap-2 overflow-x-auto">
+        <div className="flex gap-2 overflow-x-auto pb-1">
           {["all", "active", "suspended", "expired", "revoked"].map((s) => (
             <button
               key={s}
               onClick={() => handleFilter("status", s)}
-              className={`px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border ${
+              className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all border ${
                 currentStatus === s
-                  ? "bg-accent-primary/15 text-accent-primary border-accent-primary/30"
-                  : "bg-bg-surface border-border text-text-secondary hover:text-text-primary"
+                  ? "bg-accent border-accent text-white"
+                  : "bg-white border-border text-muted hover:text-foreground"
               }`}
             >
-              {s.charAt(0).toUpperCase() + s.slice(1)}
+              {s}
             </button>
           ))}
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 overflow-x-auto pb-1">
           {["all", "basic", "pro", "elite"].map((p) => (
             <button
               key={p}
               onClick={() => handleFilter("plan", p)}
-              className={`px-3 py-2 rounded-xl text-xs font-medium whitespace-nowrap transition-all border ${
+              className={`px-4 py-2 rounded-full text-xs font-black uppercase tracking-wider whitespace-nowrap transition-all border ${
                 currentPlan === p
-                  ? "bg-accent-primary/15 text-accent-primary border-accent-primary/30"
-                  : "bg-bg-surface border-border text-text-secondary hover:text-text-primary"
+                  ? "bg-accent border-accent text-white"
+                  : "bg-white border-border text-muted hover:text-foreground"
               }`}
             >
-              {p.charAt(0).toUpperCase() + p.slice(1)}
+              {p}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Bulk actions bar */}
+      {/* Bulk actions status panel */}
       <AnimatePresence>
         {selectedIds.size > 0 && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            className="flex flex-wrap items-center gap-3 bg-bg-surface border border-border-glow rounded-xl p-4"
+            className="flex flex-wrap items-center gap-3 bg-white border border-accent rounded-2xl p-5 shadow-sm"
           >
-            <span className="text-text-primary text-sm font-medium">
-              {selectedIds.size} selected
+            <span className="text-foreground text-xs font-black uppercase tracking-wider">
+              {selectedIds.size} Assets Selected
             </span>
             <div className="w-px h-6 bg-border" />
-            {bulkActions.map(({ value, label, icon: Icon, color }) => (
-              <button
-                key={value}
-                onClick={() => handleBulkAction(value)}
-                disabled={bulkLoading}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all disabled:opacity-50 ${
-                  color === "accent-success"
-                    ? "bg-accent-success/10 border-accent-success/30 text-accent-success hover:bg-accent-success/20"
-                    : color === "accent-gold"
-                    ? "bg-accent-gold/10 border-accent-gold/30 text-accent-gold hover:bg-accent-gold/20"
-                    : color === "accent-hot"
-                    ? "bg-accent-hot/10 border-accent-hot/30 text-accent-hot hover:bg-accent-hot/20"
-                    : "bg-accent-primary/10 border-accent-primary/30 text-accent-primary hover:bg-accent-primary/20"
-                }`}
-              >
-                {bulkLoading ? (
-                  <Loader2 size={11} className="animate-spin" />
-                ) : (
-                  <Icon size={11} />
-                )}
-                {label}
-              </button>
-            ))}
+            <div className="flex flex-wrap gap-2">
+              {bulkActions.map(({ value, label, icon: Icon, color }) => (
+                <button
+                  key={value}
+                  onClick={() => handleBulkAction(value)}
+                  disabled={bulkLoading}
+                  className={`flex items-center gap-1.5 px-4 py-2.5 rounded-full border text-xs font-black uppercase tracking-wider transition-all disabled:opacity-50 ${
+                    color === "emerald"
+                      ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/20"
+                      : color === "amber"
+                      ? "bg-amber-500/10 border-amber-500/30 text-amber-700 hover:bg-amber-500/20"
+                      : color === "red"
+                      ? "bg-red-500/10 border-red-500/30 text-red-700 hover:bg-red-500/20"
+                      : "bg-accent/10 border-accent/30 text-accent hover:bg-accent/20"
+                  }`}
+                >
+                  {bulkLoading ? (
+                    <Loader2 size={11} className="animate-spin" />
+                  ) : (
+                    <Icon size={11} strokeWidth={2.5} />
+                  )}
+                  {label}
+                </button>
+              ))}
+            </div>
             <button
               onClick={() => setSelectedIds(new Set())}
-              className="ml-auto text-text-muted text-xs hover:text-text-primary transition-colors"
+              className="ml-auto text-muted text-xs font-black uppercase tracking-widest hover:text-foreground"
             >
-              Clear
+              Cancel
             </button>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Alerts */}
+      {/* Process alerts */}
       <AnimatePresence>
         {bulkSuccess && (
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex items-center gap-2 bg-accent-success/10 border border-accent-success/30 rounded-xl px-4 py-3"
+            className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-3.5"
           >
-            <CheckCircle size={14} className="text-accent-success" />
-            <p className="text-accent-success text-sm">{bulkSuccess}</p>
+            <CheckCircle size={14} className="text-emerald-600 shrink-0" />
+            <p className="text-emerald-700 text-xs font-bold leading-none">{bulkSuccess}</p>
           </motion.div>
         )}
         {bulkError && (
@@ -354,66 +358,61 @@ export function LicensesTable({
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex items-center gap-2 bg-accent-hot/10 border border-accent-hot/30 rounded-xl px-4 py-3"
+            className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-2xl px-5 py-3.5"
           >
-            <AlertCircle size={14} className="text-accent-hot" />
-            <p className="text-accent-hot text-sm">{bulkError}</p>
+            <AlertCircle size={14} className="text-red-600 shrink-0" />
+            <p className="text-red-600 text-xs font-bold leading-none">{bulkError}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Table */}
-      <div className="card-surface overflow-hidden">
+      {/* Main Database Table grid */}
+      <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
         {licenses.length === 0 ? (
           <div className="p-16 text-center">
-            <Key size={32} className="text-text-muted mx-auto mb-3" />
-            <p className="text-text-secondary font-medium">
-              No licenses found
-            </p>
+            <Key size={32} className="text-muted mx-auto mb-4" />
+            <p className="text-foreground font-black text-lg">No licenses index on current filters.</p>
           </div>
         ) : (
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="w-full text-sm border-collapse">
               <thead>
-                <tr className="border-b border-border bg-bg-elevated">
-                  <th className="p-4 w-10">
+                <tr className="border-b border-border bg-background">
+                  <th className="p-5 w-12 text-center">
                     <button
                       onClick={toggleAll}
-                      className="text-text-muted hover:text-accent-primary transition-colors"
+                      className="text-muted hover:text-accent transition-colors inline-block"
                     >
                       {allSelected ? (
-                        <CheckSquare size={16} className="text-accent-primary" />
+                        <CheckSquare size={16} className="text-accent" />
                       ) : (
                         <Square size={16} />
                       )}
                     </button>
                   </th>
                   {[
-                    "Email",
-                    "Plan",
+                    "Target Client",
+                    "Tier Parameter",
                     "Status",
-                    "Key Hash",
-                    "Hardware",
-                    "Activations",
+                    "Cryptographic Signature Key",
+                    "Host CPU bound",
+                    "Session slots",
                     "Created",
-                    "Expires",
+                    "Expiration Bounds",
                     "",
                   ].map((h) => (
                     <th
                       key={h}
-                      className="text-left p-4 text-text-muted font-medium whitespace-nowrap"
+                      className="text-left p-5 text-muted text-[10px] font-black uppercase tracking-widest whitespace-nowrap"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-border">
+              <tbody className="divide-y divide-border/60">
                 {licenses.map((license, i) => {
-                  const sc =
-                    statusConfig[
-                      license.status as keyof typeof statusConfig
-                    ] || statusConfig.active;
+                  const sc = statusConfig[license.status as keyof typeof statusConfig] || statusConfig.active;
                   const StatusIcon = sc.icon;
                   const isRevealed = revealedKeys.has(license.id);
                   const isSelected = selectedIds.has(license.id);
@@ -423,101 +422,88 @@ export function LicensesTable({
                       key={license.id}
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
-                      transition={{ delay: i * 0.02 }}
-                      className={`hover:bg-bg-elevated/50 transition-colors ${
-                        isSelected ? "bg-accent-primary/5" : ""
+                      transition={{ delay: i * 0.015 }}
+                      className={`hover:bg-background/30 transition-colors ${
+                        isSelected ? "bg-accent/5" : ""
                       }`}
                     >
-                      <td className="p-4 w-10">
+                      <td className="p-5 w-12 text-center">
                         <button
                           onClick={() => toggleOne(license.id)}
-                          className="text-text-muted hover:text-accent-primary transition-colors"
+                          className="text-muted hover:text-accent transition-colors inline-block"
                         >
                           {isSelected ? (
-                            <CheckSquare
-                              size={16}
-                              className="text-accent-primary"
-                            />
+                            <CheckSquare size={16} className="text-accent" />
                           ) : (
                             <Square size={16} />
                           )}
                         </button>
                       </td>
-                      <td className="p-4">
-                        <p className="text-text-primary font-medium text-sm">
-                          {license.email || "No email"}
+                      <td className="p-5">
+                        <p className="text-foreground font-black tracking-tight text-sm">
+                          {license.email || "No bound account"}
                         </p>
                         {license.notes && (
-                          <p className="text-text-muted text-xs truncate max-w-32">
+                          <p className="text-muted text-[10px] truncate max-w-[140px] font-semibold">
                             {license.notes}
                           </p>
                         )}
                       </td>
-                      <td className="p-4">
-                        <span className="capitalize text-text-primary font-medium">
+                      <td className="p-5">
+                        <span className="text-foreground text-xs font-black uppercase tracking-wider">
                           {license.plan}
                         </span>
                         {license.plan_duration && (
-                          <p className="text-text-muted text-xs capitalize">
+                          <p className="text-muted text-[10px] font-bold uppercase tracking-widest mt-0.5">
                             {license.plan_duration}
                           </p>
                         )}
                       </td>
-                      <td className="p-4">
+                      <td className="p-5">
                         <div
-                          className={`inline-flex items-center gap-1.5 px-2 py-1 rounded-full border text-xs font-medium ${sc.bg} ${sc.color}`}
+                          className={`inline-flex items-center gap-1.5 px-3 py-1 rounded-full border text-[10px] font-black uppercase tracking-widest ${sc.bg} ${sc.color}`}
                         >
-                          <StatusIcon size={10} />
-                          <span className="capitalize">{license.status}</span>
+                          <StatusIcon size={10} strokeWidth={3} />
+                          <span>{license.status}</span>
                         </div>
                       </td>
-                      <td className="p-4">
+                      <td className="p-5">
                         <div className="flex items-center gap-2">
-                          <code className="font-mono text-text-muted text-xs">
+                          <code className="font-mono text-muted text-xs font-bold">
                             {isRevealed
                               ? license.key_hash
-                              : maskedHash(license.key_hash)}
+                              : `${license.key_hash.slice(0, 8)}••••••••${license.key_hash.slice(-6)}`}
                           </code>
                           <button
                             onClick={() => toggleReveal(license.id)}
-                            className="text-text-muted hover:text-accent-primary transition-colors"
+                            className="text-muted hover:text-accent transition-colors"
                           >
-                            {isRevealed ? (
-                              <EyeOff size={12} />
-                            ) : (
-                              <Eye size={12} />
-                            )}
+                            {isRevealed ? <EyeOff size={12} /> : <Eye size={12} />}
                           </button>
                         </div>
                       </td>
-                      <td className="p-4">
-                        <span className="text-text-muted text-xs font-mono">
+                      <td className="p-5">
+                        <span className="text-muted text-[10px] font-mono font-black uppercase tracking-tight">
                           {license.hardware_id
                             ? `${license.hardware_id.slice(0, 12)}...`
-                            : "Not activated"}
+                            : "Unlocked Slots"}
                         </span>
                       </td>
-                      <td className="p-4 text-text-secondary text-center">
-                        {license.activation_count}
-                        {" / "}
-                        {license.max_machines === 999
-                          ? "∞"
-                          : license.max_machines}
+                      <td className="p-5 text-center text-foreground font-black text-xs">
+                        {license.activation_count} / {license.max_machines === 999 ? "∞" : license.max_machines}
                       </td>
-                      <td className="p-4 text-text-muted text-xs">
+                      <td className="p-5 text-muted font-mono text-xs font-bold">
                         {formatDate(license.created_at)}
                       </td>
-                      <td className="p-4 text-text-muted text-xs">
-                        {license.expires_at
-                          ? formatDate(license.expires_at)
-                          : "Lifetime"}
+                      <td className="p-5 text-muted font-mono text-xs font-bold">
+                        {license.expires_at ? formatDate(license.expires_at) : "Lifetime"}
                       </td>
-                      <td className="p-4">
+                      <td className="p-5">
                         <Link
                           href={`/admin/licenses/${license.id}`}
-                          className="text-accent-primary hover:underline text-xs font-medium"
+                          className="text-accent text-xs font-black uppercase tracking-widest hover:underline whitespace-nowrap"
                         >
-                          Manage
+                          Manage &rarr;
                         </Link>
                       </td>
                     </motion.tr>

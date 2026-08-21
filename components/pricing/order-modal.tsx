@@ -9,9 +9,8 @@ import {
   Check,
   AlertCircle,
   Loader2,
-  ChevronDown,
 } from "lucide-react";
-import { PLANS, PRICES, PlanKey, getPrice } from "@/lib/license";
+import { PLANS, PlanKey, getPrice } from "@/lib/license";
 import { useRouter } from "next/navigation";
 
 interface OrderModalProps {
@@ -60,11 +59,11 @@ function CopyButton({ value }: { value: string }) {
   return (
     <button
       onClick={handleCopy}
-      className="text-text-muted hover:text-accent-primary transition-colors ml-2 flex-shrink-0"
+      className="text-muted hover:text-accent transition-colors ml-2 flex-shrink-0"
       title="Copy"
     >
       {copied ? (
-        <Check size={12} className="text-accent-success" />
+        <Check size={12} className="text-accent" />
       ) : (
         <Copy size={12} />
       )}
@@ -89,9 +88,7 @@ export function OrderModal({
   const [email, setEmail] = useState("");
   const [notes, setNotes] = useState("");
   const [screenshot, setScreenshot] = useState<File | null>(null);
-  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(
-    null
-  );
+  const [screenshotPreview, setScreenshotPreview] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
@@ -125,7 +122,6 @@ export function OrderModal({
   const handleSubmit = async () => {
     setError(null);
 
-    // Validate
     if (!name.trim()) return setError("Please enter your name");
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
       return setError("Please enter a valid email address");
@@ -159,48 +155,55 @@ export function OrderModal({
         throw new Error(data.error || "Submission failed");
       }
 
-      // Success — redirect to success page
-      router.push(`/success?order=${data.orderId}&email=${encodeURIComponent(email)}`);
+      router.push(
+        `/success?order=${data.orderId}&email=${encodeURIComponent(email)}`
+      );
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Something went wrong. Please try again."
+      );
     } finally {
       setLoading(false);
     }
   };
+
+  const inputClass =
+    "w-full bg-white border border-border rounded-xl px-4 py-3 text-foreground text-sm font-medium placeholder:text-muted focus:outline-none focus:border-accent transition-colors";
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-foreground/60 backdrop-blur-sm"
       onClick={(e) => e.target === e.currentTarget && onClose()}
     >
       <motion.div
-        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        initial={{ opacity: 0, scale: 0.96, y: 16 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
-        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        exit={{ opacity: 0, scale: 0.96, y: 16 }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
-        className="w-full max-w-lg bg-bg-surface border border-border rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto"
+        className="w-full max-w-lg bg-background border border-border rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto shadow-2xl"
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
           <div>
-            <h2 className="font-display font-bold text-text-primary text-xl">
+            <h2 className="font-display font-black text-foreground text-xl tracking-tight">
               {step === 1 ? "Complete Payment" : "Your Details"}
             </h2>
-            <p className="text-text-muted text-sm mt-0.5">
+            <p className="text-muted text-sm mt-1 font-medium">
               {planData.name} ·{" "}
               {duration === "lifetime" ? "Lifetime" : "Monthly"} ·{" "}
-              {devices === "1" ? "1 Device" : "Unlimited"} · $
-              {price}
+              {devices === "1" ? "1 Device" : "Unlimited"} · ${price}
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-text-muted hover:text-text-primary transition-colors p-2"
+            className="w-9 h-9 rounded-full border border-border flex items-center justify-center text-muted hover:text-foreground hover:border-foreground transition-colors"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
@@ -209,10 +212,10 @@ export function OrderModal({
           {["Pay", "Submit"].map((label, i) => (
             <div
               key={label}
-              className={`flex-1 py-3 text-center text-xs font-medium uppercase tracking-wider transition-colors ${
+              className={`flex-1 py-3.5 text-center text-[11px] font-bold uppercase tracking-[0.15em] transition-colors ${
                 step === i + 1
-                  ? "text-accent-primary border-b-2 border-accent-primary"
-                  : "text-text-muted"
+                  ? "text-accent border-b-2 border-accent"
+                  : "text-muted"
               }`}
             >
               {i + 1}. {label}
@@ -223,13 +226,13 @@ export function OrderModal({
         <div className="p-6">
           {step === 1 && (
             <motion.div
-              initial={{ opacity: 0, x: -10 }}
+              initial={{ opacity: 0, x: -8 }}
               animate={{ opacity: 1, x: 0 }}
               className="space-y-6"
             >
-              {/* Step 1: Payment method selection + details */}
+              {/* Payment method */}
               <div>
-                <label className="text-text-secondary text-sm font-medium mb-3 block">
+                <label className="text-foreground text-sm font-bold mb-3 block">
                   Select Payment Method
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -242,10 +245,10 @@ export function OrderModal({
                     <button
                       key={key}
                       onClick={() => setPaymentMethod(key)}
-                      className={`p-3 rounded-xl border text-sm font-medium transition-all ${
+                      className={`p-3 rounded-xl border text-sm font-bold transition-all ${
                         paymentMethod === key
-                          ? "border-accent-primary bg-accent-primary/10 text-accent-primary"
-                          : "border-border text-text-secondary hover:border-border-glow"
+                          ? "border-accent bg-accent/10 text-accent"
+                          : "border-border bg-white text-muted hover:border-foreground/30 hover:text-foreground"
                       }`}
                     >
                       {val.label}
@@ -254,25 +257,28 @@ export function OrderModal({
                 </div>
               </div>
 
-              {/* Payment details */}
-              <div className="bg-bg-elevated border border-border rounded-xl p-5 space-y-3">
+              {/* Payment details card */}
+              <div className="bg-white border border-border rounded-2xl p-5 space-y-3.5">
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-text-secondary text-sm font-medium">
-                    {PAYMENT_DETAILS[paymentMethod].label} Details
+                  <span className="text-muted text-xs font-bold uppercase tracking-widest">
+                    {PAYMENT_DETAILS[paymentMethod].label}
                   </span>
-                  <span className="text-accent-success font-bold text-lg">
-                    ${price} USD
+                  <span className="font-display font-black text-foreground text-xl">
+                    ${price}
+                    <span className="text-muted text-sm font-bold ml-1">USD</span>
                   </span>
                 </div>
                 {PAYMENT_DETAILS[paymentMethod].details.map(
                   ({ label, value }) => (
                     <div
                       key={label}
-                      className="flex items-center justify-between"
+                      className="flex items-center justify-between gap-3"
                     >
-                      <span className="text-text-muted text-xs">{label}</span>
-                      <div className="flex items-center">
-                        <span className="font-mono text-text-primary text-sm">
+                      <span className="text-muted text-xs font-medium">
+                        {label}
+                      </span>
+                      <div className="flex items-center min-w-0">
+                        <span className="font-mono text-foreground text-sm font-medium truncate">
                           {value}
                         </span>
                         <CopyButton value={value} />
@@ -282,60 +288,71 @@ export function OrderModal({
                 )}
               </div>
 
-              {/* Instructions */}
-              <div className="bg-accent-primary/5 border border-accent-primary/20 rounded-xl p-4">
-                <p className="text-accent-primary text-sm font-medium mb-2">
+              {/* How it works */}
+              <div className="bg-accent/5 border border-accent/20 rounded-2xl p-5">
+                <p className="text-accent text-sm font-black mb-3 tracking-tight">
                   How it works
                 </p>
-                <ol className="text-text-secondary text-sm space-y-1.5 list-decimal list-inside">
-                  <li>Send exactly ${price} USD using the details above</li>
-                  <li>Take a clear screenshot of the payment confirmation</li>
-                  <li>Click Next and fill in your details</li>
-                  <li>Upload the screenshot and submit</li>
-                  <li>Your license key arrives within a few hours</li>
+                <ol className="text-foreground/80 text-sm space-y-2 font-medium">
+                  <li className="flex gap-2">
+                    <span className="text-accent font-black shrink-0">1.</span>
+                    Send exactly ${price} USD using the details above
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-accent font-black shrink-0">2.</span>
+                    Take a clear screenshot of the payment confirmation
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-accent font-black shrink-0">3.</span>
+                    Click continue and fill in your details
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-accent font-black shrink-0">4.</span>
+                    Upload the screenshot and submit
+                  </li>
+                  <li className="flex gap-2">
+                    <span className="text-accent font-black shrink-0">5.</span>
+                    Your license key arrives within a few hours
+                  </li>
                 </ol>
               </div>
 
               <button
                 onClick={() => setStep(2)}
-                className="w-full py-4 bg-gradient-accent text-white rounded-xl font-semibold text-sm tracking-wide uppercase hover:shadow-[0_8px_30px_rgba(102,126,234,0.4)] hover:-translate-y-0.5 transition-all duration-300"
+                className="w-full py-4 bg-accent text-white rounded-full font-bold text-sm tracking-wider uppercase hover:bg-[#4F52D6] transition-colors"
               >
-                I've Paid — Continue
+                I&apos;ve Paid. Continue
               </button>
             </motion.div>
           )}
 
           {step === 2 && (
             <motion.div
-              initial={{ opacity: 0, x: 10 }}
+              initial={{ opacity: 0, x: 8 }}
               animate={{ opacity: 1, x: 0 }}
               className="space-y-5"
             >
               {/* Renewal toggle */}
-              <div className="flex items-center gap-3 p-4 bg-bg-elevated border border-border rounded-xl">
+              <label className="flex items-center gap-3 p-4 bg-white border border-border rounded-2xl cursor-pointer hover:border-foreground/20 transition-colors">
                 <input
                   type="checkbox"
-                  id="renewal"
                   checked={isRenewal}
                   onChange={(e) => setIsRenewal(e.target.checked)}
-                  className="w-4 h-4 accent-accent-primary rounded"
+                  className="w-4 h-4 accent-[#6366F1] rounded"
                 />
-                <label
-                  htmlFor="renewal"
-                  className="text-text-secondary text-sm cursor-pointer"
-                >
+                <span className="text-foreground text-sm font-medium">
                   This is a renewal (I already have a license)
-                </label>
-              </div>
+                </span>
+              </label>
 
-              {/* Existing key (if renewal) */}
+              {/* Existing key */}
               {isRenewal && (
                 <motion.div
                   initial={{ height: 0, opacity: 0 }}
                   animate={{ height: "auto", opacity: 1 }}
                   className="overflow-hidden"
                 >
-                  <label className="text-text-secondary text-sm font-medium mb-2 block">
+                  <label className="text-foreground text-sm font-bold mb-2 block">
                     Existing License Key
                   </label>
                   <input
@@ -345,14 +362,14 @@ export function OrderModal({
                       setExistingKey(e.target.value.toUpperCase())
                     }
                     placeholder="PROWL-XXXX-XXXX-XXXX-XXXX"
-                    className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-text-primary text-sm font-mono placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors"
+                    className={`${inputClass} font-mono`}
                   />
                 </motion.div>
               )}
 
               {/* Name */}
               <div>
-                <label className="text-text-secondary text-sm font-medium mb-2 block">
+                <label className="text-foreground text-sm font-bold mb-2 block">
                   Full Name
                 </label>
                 <input
@@ -360,16 +377,16 @@ export function OrderModal({
                   value={name}
                   onChange={(e) => setName(e.target.value)}
                   placeholder="John Smith"
-                  className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors"
+                  className={inputClass}
                 />
               </div>
 
               {/* Email */}
               <div>
-                <label className="text-text-secondary text-sm font-medium mb-2 block">
-                  Email Address
-                  <span className="text-text-muted font-normal ml-1">
-                    (license will be sent here)
+                <label className="text-foreground text-sm font-bold mb-2 block">
+                  Email Address{" "}
+                  <span className="text-muted font-medium">
+                    (license sent here)
                   </span>
                 </label>
                 <input
@@ -377,22 +394,22 @@ export function OrderModal({
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="you@example.com"
-                  className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors"
+                  className={inputClass}
                 />
               </div>
 
               {/* Screenshot upload */}
               <div>
-                <label className="text-text-secondary text-sm font-medium mb-2 block">
+                <label className="text-foreground text-sm font-bold mb-2 block">
                   Payment Screenshot
                 </label>
                 <div
-                  className={`relative border-2 border-dashed rounded-xl transition-all duration-200 ${
+                  className={`relative border-2 border-dashed rounded-2xl transition-all duration-200 overflow-hidden ${
                     dragOver
-                      ? "border-accent-primary bg-accent-primary/10"
+                      ? "border-accent bg-accent/5"
                       : screenshotPreview
-                      ? "border-accent-success"
-                      : "border-border hover:border-border-glow"
+                        ? "border-accent"
+                        : "border-border hover:border-foreground/30 bg-white"
                   }`}
                   onDragOver={(e) => {
                     e.preventDefault();
@@ -406,22 +423,20 @@ export function OrderModal({
                       <img
                         src={screenshotPreview}
                         alt="Payment screenshot"
-                        className="w-full h-48 object-cover rounded-xl"
+                        className="w-full h-48 object-cover"
                       />
                       <button
                         onClick={() => {
                           setScreenshot(null);
                           setScreenshotPreview(null);
                         }}
-                        className="absolute top-2 right-2 bg-bg-deep/80 border border-border rounded-full p-1 text-text-secondary hover:text-accent-hot transition-colors"
+                        className="absolute top-3 right-3 w-8 h-8 bg-foreground/80 rounded-full flex items-center justify-center text-white hover:bg-foreground transition-colors"
                       >
                         <X size={12} />
                       </button>
-                      <div className="absolute bottom-2 left-2 bg-accent-success/20 border border-accent-success/40 rounded-full px-2 py-0.5 flex items-center gap-1">
-                        <Check size={10} className="text-accent-success" />
-                        <span className="text-accent-success text-xs">
-                          Uploaded
-                        </span>
+                      <div className="absolute bottom-3 left-3 bg-accent text-white rounded-full px-3 py-1 flex items-center gap-1.5">
+                        <Check size={11} strokeWidth={3} />
+                        <span className="text-xs font-bold">Uploaded</span>
                       </div>
                     </div>
                   ) : (
@@ -429,14 +444,14 @@ export function OrderModal({
                       onClick={() => fileInputRef.current?.click()}
                       className="w-full p-8 flex flex-col items-center gap-3"
                     >
-                      <div className="w-12 h-12 rounded-xl bg-bg-elevated border border-border flex items-center justify-center">
-                        <Upload size={18} className="text-text-muted" />
+                      <div className="w-12 h-12 rounded-full bg-background border border-border flex items-center justify-center">
+                        <Upload size={18} className="text-muted" />
                       </div>
                       <div className="text-center">
-                        <p className="text-text-secondary text-sm font-medium">
+                        <p className="text-foreground text-sm font-bold">
                           Drop screenshot here or click to browse
                         </p>
-                        <p className="text-text-muted text-xs mt-1">
+                        <p className="text-muted text-xs mt-1 font-medium">
                           JPG, PNG or WebP · Max 5MB
                         </p>
                       </div>
@@ -457,9 +472,9 @@ export function OrderModal({
 
               {/* Notes */}
               <div>
-                <label className="text-text-secondary text-sm font-medium mb-2 block">
+                <label className="text-foreground text-sm font-bold mb-2 block">
                   Notes{" "}
-                  <span className="text-text-muted font-normal">(optional)</span>
+                  <span className="text-muted font-medium">(optional)</span>
                 </label>
                 <textarea
                   value={notes}
@@ -470,34 +485,34 @@ export function OrderModal({
                       : "Any additional info..."
                   }
                   rows={2}
-                  className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors resize-none"
+                  className={`${inputClass} resize-none`}
                 />
               </div>
 
               {/* Error */}
               {error && (
                 <motion.div
-                  initial={{ opacity: 0, y: -5 }}
+                  initial={{ opacity: 0, y: -4 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="flex items-center gap-2 bg-accent-hot/10 border border-accent-hot/30 rounded-xl p-3"
+                  className="flex items-center gap-2.5 bg-foreground/5 border border-foreground/15 rounded-xl p-3.5"
                 >
-                  <AlertCircle size={14} className="text-accent-hot" />
-                  <p className="text-accent-hot text-sm">{error}</p>
+                  <AlertCircle size={14} className="text-foreground shrink-0" />
+                  <p className="text-foreground text-sm font-medium">{error}</p>
                 </motion.div>
               )}
 
               {/* Buttons */}
-              <div className="flex gap-3">
+              <div className="flex gap-3 pt-1">
                 <button
                   onClick={() => setStep(1)}
-                  className="flex-1 py-3 border border-border rounded-xl text-text-secondary text-sm font-medium hover:border-border-glow hover:text-text-primary transition-all"
+                  className="flex-1 py-3.5 border border-border rounded-full text-muted text-sm font-bold hover:border-foreground hover:text-foreground transition-all"
                 >
                   Back
                 </button>
                 <button
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="flex-[2] py-3 bg-gradient-accent text-white rounded-xl font-semibold text-sm tracking-wide uppercase hover:shadow-[0_8px_30px_rgba(102,126,234,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  className="flex-[2] py-3.5 bg-accent text-white rounded-full font-bold text-sm tracking-wider uppercase hover:bg-[#4F52D6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   {loading ? (
                     <>
@@ -510,9 +525,9 @@ export function OrderModal({
                 </button>
               </div>
 
-              <p className="text-text-muted text-xs text-center">
-                Your license key will be emailed within a few hours of
-                payment verification.
+              <p className="text-muted text-xs text-center font-medium">
+                Your license key will be emailed within a few hours of payment
+                verification.
               </p>
             </motion.div>
           )}

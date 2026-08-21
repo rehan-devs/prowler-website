@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import {
   ArrowLeft,
   CheckCircle,
@@ -12,8 +13,8 @@ import {
   Loader2,
   ExternalLink,
   RefreshCw,
+  AlertCircle,
 } from "lucide-react";
-import Link from "next/link";
 
 interface Order {
   id: string;
@@ -44,12 +45,12 @@ function CopyButton({ value }: { value: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }}
-      className="text-text-muted hover:text-accent-primary transition-colors"
+      className="text-muted hover:text-accent transition-colors shrink-0"
     >
       {copied ? (
-        <Check size={14} className="text-accent-success" />
+        <Check size={12} className="text-emerald-600" strokeWidth={3} />
       ) : (
-        <Copy size={14} />
+        <Copy size={12} />
       )}
     </button>
   );
@@ -115,7 +116,7 @@ export function OrderReview({
 
   const formatDate = (d: string) =>
     new Date(d).toLocaleString("en-US", {
-      month: "long",
+      month: "short",
       day: "numeric",
       year: "numeric",
       hour: "2-digit",
@@ -123,124 +124,107 @@ export function OrderReview({
     });
 
   return (
-    <div className="space-y-6 max-w-4xl">
-      {/* Header */}
-      <div className="flex items-center gap-4">
+    <div className="space-y-6 max-w-5xl">
+      
+      {/* Back button */}
+      <div>
         <Link
           href="/admin/orders"
-          className="flex items-center gap-2 text-text-muted hover:text-text-primary transition-colors text-sm"
+          className="inline-flex items-center gap-1.5 text-muted hover:text-foreground text-xs font-black uppercase tracking-widest transition-colors mb-4"
         >
-          <ArrowLeft size={14} />
-          Back to Orders
+          <ArrowLeft size={12} />
+          Back to receipts
         </Link>
       </div>
 
-      <div className="flex items-start justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-text-primary">
-            Order Review
+          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-3">
+            Proof of payment audit
+          </span>
+          <h1 className="text-2xl font-display font-black text-foreground tracking-tight leading-none">
+            Audit Billing
           </h1>
-          <p className="text-text-muted text-sm font-mono mt-1">{order.id}</p>
+          <p className="text-muted text-xs font-mono font-bold mt-1.5">
+            Order UID: {order.id}
+          </p>
         </div>
         <div
-          className={`px-3 py-1.5 rounded-xl text-sm font-medium border ${
+          className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border ${
             order.status === "pending"
-              ? "bg-accent-gold/10 border-accent-gold/30 text-accent-gold"
+              ? "bg-amber-500/10 border-amber-500/30 text-amber-700"
               : order.status === "approved"
-              ? "bg-accent-success/10 border-accent-success/30 text-accent-success"
-              : "bg-accent-hot/10 border-accent-hot/30 text-accent-hot"
+              ? "bg-emerald-500/10 border-emerald-500/30 text-emerald-700"
+              : "bg-red-500/10 border-red-500/30 text-red-700"
           }`}
         >
-          {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+          {order.status}
         </div>
       </div>
 
-      {/* Generated key success */}
-      {generatedKey && (
-        <motion.div
-          initial={{ opacity: 0, y: -10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="bg-accent-success/10 border border-accent-success/30 rounded-xl p-5"
-        >
-          <div className="flex items-center gap-2 mb-3">
-            <CheckCircle size={16} className="text-accent-success" />
-            <p className="text-accent-success font-semibold">
-              Order Approved — License Generated
+      {/* Approve and key delivery confirmation banner */}
+      <AnimatePresence>
+        {generatedKey && (
+          <motion.div
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="bg-emerald-50 border border-emerald-200 rounded-2xl p-6 space-y-4"
+          >
+            <div className="flex items-center gap-2">
+              <CheckCircle size={16} className="text-emerald-600 shrink-0" />
+              <p className="text-emerald-700 font-bold text-sm tracking-tight leading-none">
+                Billing Approved. Core Key Token Successfully Provisioned.
+              </p>
+            </div>
+            <p className="text-muted text-xs font-semibold leading-relaxed">
+              Copy this token and transmit to client at: <strong className="text-foreground">{order.customer_email}</strong>.
             </p>
-          </div>
-          <p className="text-text-secondary text-sm mb-3">
-            Copy this key and send it to{" "}
-            <strong>{order.customer_email}</strong>
-          </p>
-          <div className="flex items-center gap-3 bg-bg-deep border border-accent-success/30 rounded-xl p-4">
-            <code className="font-mono text-accent-success text-lg flex-1">
-              {generatedKey}
-            </code>
-            <CopyButton value={generatedKey} />
-          </div>
-          <p className="text-text-muted text-xs mt-3">
-            This key is only shown once. Copy it now.
-          </p>
-        </motion.div>
-      )}
+            <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-white border border-emerald-200 rounded-xl p-4">
+              <code className="font-mono text-emerald-700 text-base font-black tracking-widest flex-1 break-all select-all">
+                {generatedKey}
+              </code>
+              <CopyButton value={generatedKey} />
+            </div>
+            <p className="text-muted text-[10px] font-bold uppercase tracking-wider">
+              Token signature state generated once. This reference catalog is unrecoverable.
+            </p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Error */}
+      {/* Errors banner */}
       {error && (
-        <div className="bg-accent-hot/10 border border-accent-hot/30 rounded-xl p-4 text-accent-hot text-sm">
+        <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-xl p-4 text-red-600 text-xs font-bold leading-none">
+          <AlertCircle size={14} className="shrink-0" />
           {error}
         </div>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Order details */}
-        <div className="space-y-4">
-          <div className="card-surface p-5">
-            <h2 className="font-display font-semibold text-text-primary mb-4">
-              Order Details
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* Param metrics card block */}
+        <div className="lg:col-span-6 space-y-6">
+          
+          {/* Main info card */}
+          <div className="bg-white border border-border rounded-2xl p-6 md:p-8 shadow-sm">
+            <h2 className="font-display font-black text-lg text-foreground tracking-tight mb-6">
+              Receipt Parameters
             </h2>
-            <div className="space-y-3">
+            <div className="space-y-4">
               {[
-                { label: "Customer", value: order.customer_name },
-                {
-                  label: "Email",
-                  value: order.customer_email,
-                  copy: true,
-                },
-                {
-                  label: "Plan",
-                  value: `${order.plan.toUpperCase()} — ${
-                    order.plan_duration === "lifetime"
-                      ? "Lifetime"
-                      : "Monthly"
-                  } — ${
-                    order.devices === "1" ? "1 Device" : "Unlimited"
-                  }`,
-                },
-                { label: "Amount", value: `$${order.amount_usd} USD` },
-                {
-                  label: "Payment",
-                  value: order.payment_method,
-                },
-                {
-                  label: "Type",
-                  value: order.is_renewal ? "Renewal" : "New Purchase",
-                },
-                {
-                  label: "Submitted",
-                  value: formatDate(order.created_at),
-                },
+                { label: "Target Client Name", value: order.customer_name },
+                { label: "Target Account Email", value: order.customer_email, copy: true },
+                { label: "Asset signature tier", value: `${order.plan} &middot; ${order.plan_duration} &middot; ${order.devices === "1" ? "1 Device" : "Unlimited Devices"}` },
+                { label: "Volume Total", value: `$${order.amount_usd} USD` },
+                { label: "Routing pipeline", value: order.payment_method },
+                { label: "Operation Type", value: order.is_renewal ? "Renew Existing Key" : "New Contract Purchase" },
+                { label: "Submitted date", value: formatDate(order.created_at) },
               ].map(({ label, value, copy }) => (
-                <div
-                  key={label}
-                  className="flex items-start justify-between gap-4"
-                >
-                  <span className="text-text-muted text-sm flex-shrink-0">
-                    {label}
-                  </span>
+                <div key={label} className="flex justify-between items-baseline border-b border-border/40 pb-2.5 last:border-0 last:pb-0">
+                  <span className="text-muted text-[10px] font-bold uppercase tracking-wider">{label}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-text-primary text-sm text-right">
-                      {value}
-                    </span>
+                    <span className="text-foreground text-xs font-black tracking-tight text-right" dangerouslySetInnerHTML={{ __html: value }} />
                     {copy && <CopyButton value={value} />}
                   </div>
                 </div>
@@ -248,160 +232,161 @@ export function OrderReview({
             </div>
           </div>
 
-          {/* Renewal info */}
+          {/* Renewal target matching details */}
           {order.is_renewal && order.existing_license_key && (
-            <div className="card-surface p-5">
-              <h2 className="font-display font-semibold text-text-primary mb-3 flex items-center gap-2">
-                <RefreshCw size={14} className="text-accent-purple" />
-                Renewal Info
+            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+              <h2 className="font-display font-black text-base text-foreground tracking-tight mb-4 flex items-center gap-2">
+                <RefreshCw size={14} className="text-purple-600 shrink-0" />
+                Target Key Replacement
               </h2>
-              <div className="flex items-center justify-between">
-                <span className="text-text-muted text-sm">Existing Key</span>
-                <div className="flex items-center gap-2">
-                  <code className="font-mono text-text-primary text-xs">
-                    {order.existing_license_key}
-                  </code>
-                  <CopyButton value={order.existing_license_key} />
-                </div>
+              <div className="flex items-center justify-between gap-4 bg-background border border-border rounded-xl p-4">
+                <code className="font-mono text-foreground text-xs font-black break-all select-all">
+                  {order.existing_license_key}
+                </code>
+                <CopyButton value={order.existing_license_key} />
               </div>
             </div>
           )}
 
           {/* Customer notes */}
           {order.notes && (
-            <div className="card-surface p-5">
-              <h2 className="font-display font-semibold text-text-primary mb-2">
-                Customer Notes
+            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+              <h2 className="font-display font-black text-base text-foreground tracking-tight mb-2">
+                Client Notes
               </h2>
-              <p className="text-text-secondary text-sm">{order.notes}</p>
+              <p className="text-muted text-xs font-semibold leading-relaxed">
+                &ldquo;{order.notes}&rdquo;
+              </p>
             </div>
           )}
 
-          {/* Admin notes */}
+          {/* Internal admin notes */}
           {isPending && (
-            <div className="card-surface p-5">
-              <h2 className="font-display font-semibold text-text-primary mb-3">
-                Admin Notes (optional)
+            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+              <h2 className="font-display font-black text-base text-foreground tracking-tight mb-3">
+                Internal Operational Notes
               </h2>
               <textarea
                 value={adminNotes}
                 onChange={(e) => setAdminNotes(e.target.value)}
-                placeholder="Internal notes about this order..."
+                placeholder="Audit notes, manual overrides, reference logs..."
                 rows={3}
-                className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors resize-none"
+                className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground text-sm font-semibold focus:outline-none focus:border-accent resize-none"
               />
             </div>
           )}
 
-          {/* Reviewed info */}
+          {/* Audit trace historical stamps */}
           {order.reviewed_at && (
-            <div className="card-surface p-5">
-              <p className="text-text-muted text-xs">
-                Reviewed by{" "}
-                <span className="text-text-secondary">
-                  {order.reviewed_by}
-                </span>{" "}
-                on {formatDate(order.reviewed_at)}
+            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+              <p className="text-muted text-[10px] font-bold uppercase tracking-widest leading-normal">
+                Audited by <strong className="text-foreground font-black">{order.reviewed_by}</strong> on {formatDate(order.reviewed_at)}
               </p>
               {order.admin_notes && (
-                <p className="text-text-secondary text-sm mt-2">
-                  {order.admin_notes}
-                </p>
+                <div className="mt-3 bg-background border border-border/60 rounded-xl p-4">
+                  <p className="text-foreground text-xs font-semibold leading-relaxed">
+                    {order.admin_notes}
+                  </p>
+                </div>
               )}
             </div>
           )}
+
         </div>
 
-        {/* Screenshot + actions */}
-        <div className="space-y-4">
-          {/* Payment screenshot */}
-          <div className="card-surface p-5">
-            <h2 className="font-display font-semibold text-text-primary mb-4">
-              Payment Screenshot
+        {/* Screenshot preview panel */}
+        <div className="lg:col-span-6 space-y-6">
+          
+          {/* Payment proof receipt thumbnail upload box */}
+          <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+            <h2 className="font-display font-black text-base text-foreground tracking-tight mb-4">
+              Payment Verification Screenshot
             </h2>
             {screenshotUrl ? (
-              <div>
-                <img
-                  src={screenshotUrl}
-                  alt="Payment proof"
-                  className="w-full rounded-xl border border-border"
-                />
+              <div className="space-y-4">
+                <div className="border border-border rounded-xl overflow-hidden bg-background">
+                  <img
+                    src={screenshotUrl}
+                    alt="Proof Receipt Screenshot"
+                    className="w-full h-auto object-contain max-h-[420px]"
+                  />
+                </div>
                 <a
                   href={screenshotUrl}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1 text-accent-primary text-xs mt-3 hover:underline"
+                  className="group flex items-center justify-center gap-2 py-3 border border-border hover:border-accent hover:text-accent rounded-full text-xs font-black uppercase tracking-wider transition-colors bg-white w-full"
                 >
-                  <ExternalLink size={10} />
-                  Open full size
+                  Inspect asset proof fullscreen
+                  <span className="group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
                 </a>
               </div>
             ) : (
-              <div className="h-32 bg-bg-elevated rounded-xl border border-border flex items-center justify-center">
-                <p className="text-text-muted text-sm">
-                  Screenshot not available
+              <div className="h-48 bg-background rounded-xl border border-border/80 flex items-center justify-center">
+                <p className="text-muted text-xs font-bold uppercase tracking-wider">
+                  No payment snapshot asset uploaded.
                 </p>
               </div>
             )}
           </div>
 
-          {/* Actions */}
+          {/* Audit controls button triggers */}
           {isPending && !generatedKey && (
-            <div className="card-surface p-5 space-y-3">
-              <h2 className="font-display font-semibold text-text-primary mb-4">
-                Actions
+            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm space-y-3">
+              <h2 className="font-display font-black text-base text-foreground tracking-tight mb-4">
+                Verify Operations
               </h2>
 
               <button
                 onClick={handleApprove}
                 disabled={approving}
-                className="w-full flex items-center justify-center gap-2 py-4 bg-accent-success/15 border border-accent-success/40 text-accent-success rounded-xl font-semibold text-sm hover:bg-accent-success/25 transition-all disabled:opacity-50"
+                className="w-full flex items-center justify-center gap-2 py-4 bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/20 rounded-full text-xs font-black uppercase tracking-widest transition-colors disabled:opacity-50"
               >
                 {approving ? (
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={12} className="animate-spin" />
                 ) : (
-                  <CheckCircle size={16} />
+                  <CheckCircle size={12} strokeWidth={3} />
                 )}
-                {approving ? "Approving..." : "Approve & Generate License"}
+                {approving ? "Registering and dispatching..." : "Approve & Dispatch Key Token"}
               </button>
 
               {!showRejectForm ? (
                 <button
                   onClick={() => setShowRejectForm(true)}
-                  className="w-full flex items-center justify-center gap-2 py-4 bg-accent-hot/10 border border-accent-hot/30 text-accent-hot rounded-xl font-semibold text-sm hover:bg-accent-hot/20 transition-all"
+                  className="w-full flex items-center justify-center gap-2 py-4 bg-red-500/10 border border-red-500/30 text-red-700 hover:bg-red-500/20 rounded-full text-xs font-black uppercase tracking-widest transition-colors"
                 >
-                  <XCircle size={16} />
-                  Reject Order
+                  <XCircle size={12} strokeWidth={3} />
+                  Reject receipt proof
                 </button>
               ) : (
                 <motion.div
                   initial={{ opacity: 0, height: 0 }}
                   animate={{ opacity: 1, height: "auto" }}
-                  className="space-y-3"
+                  className="space-y-3 pt-2"
                 >
                   <textarea
                     value={rejectReason}
                     onChange={(e) => setRejectReason(e.target.value)}
-                    placeholder="Reason for rejection (customer will not see this)..."
-                    rows={2}
-                    className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-hot transition-colors resize-none"
+                    placeholder="Enter rejection reason code (Internal administrative use only)..."
+                    rows={3}
+                    className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground text-xs font-bold focus:outline-none focus:border-red-500 resize-none"
                   />
                   <div className="flex gap-2">
                     <button
                       onClick={() => setShowRejectForm(false)}
-                      className="flex-1 py-3 border border-border rounded-xl text-text-secondary text-sm hover:border-border-glow transition-all"
+                      className="flex-1 py-3 border border-border rounded-full text-foreground hover:border-accent text-xs font-black uppercase tracking-wider transition-colors bg-white"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={handleReject}
                       disabled={rejecting}
-                      className="flex-1 py-3 bg-accent-hot/15 border border-accent-hot/40 text-accent-hot rounded-xl text-sm font-semibold hover:bg-accent-hot/25 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                      className="flex-1 py-3 bg-red-500/10 border border-red-500/30 text-red-700 hover:bg-red-500/20 rounded-full text-xs font-black uppercase tracking-wider transition-colors disabled:opacity-50 flex items-center justify-center gap-1.5"
                     >
                       {rejecting ? (
-                        <Loader2 size={14} className="animate-spin" />
+                        <Loader2 size={12} className="animate-spin" />
                       ) : (
-                        "Confirm Reject"
+                        "Confirm Rejection"
                       )}
                     </button>
                   </div>
@@ -409,7 +394,9 @@ export function OrderReview({
               )}
             </div>
           )}
+
         </div>
+
       </div>
     </div>
   );

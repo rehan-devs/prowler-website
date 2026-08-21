@@ -1,41 +1,15 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { useInView } from "framer-motion";
-import { Check, Zap, Shield, Star } from "lucide-react";
+import { motion, AnimatePresence, useInView } from "framer-motion";
+import { Check } from "lucide-react";
 import { PLANS, PRICES, PlanKey } from "@/lib/license";
 import { OrderModal } from "./order-modal";
-import { VerticalCutReveal } from "@/components/ui/vertical-cut-reveal";
 
 type Duration = "lifetime" | "subscription";
 type Devices = "1" | "unlimited";
 
 const planOrder: PlanKey[] = ["basic", "pro", "elite"];
-
-const planMeta = {
-  basic: {
-    icon: Zap,
-    badge: null,
-    borderColor: "border-border",
-    accentColor: "#667eea",
-    tagline: "Get started fast",
-  },
-  pro: {
-    icon: Star,
-    badge: "Most Popular",
-    borderColor: "border-accent-primary",
-    accentColor: "#764ba2",
-    tagline: "For serious prospectors",
-  },
-  elite: {
-    icon: Shield,
-    badge: "Best Value",
-    borderColor: "border-border",
-    accentColor: "#ff6464",
-    tagline: "Unlimited everything",
-  },
-};
 
 function PlanToggle({
   label,
@@ -50,24 +24,24 @@ function PlanToggle({
 }) {
   return (
     <div className="flex flex-col items-center gap-2">
-      <span className="text-text-muted text-xs uppercase tracking-widest">
+      <span className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted">
         {label}
       </span>
-      <div className="relative flex bg-bg-surface border border-border rounded-xl p-1">
+      <div className="relative flex bg-white border border-border rounded-full p-1">
         {options.map((opt) => (
           <button
             key={opt.value}
             onClick={() => onChange(opt.value)}
-            className={`relative z-10 px-5 py-2 rounded-lg text-sm font-medium transition-colors duration-200 ${
+            className={`relative z-10 px-5 py-2 rounded-full text-sm font-bold transition-colors duration-200 ${
               value === opt.value
                 ? "text-white"
-                : "text-text-secondary hover:text-text-primary"
+                : "text-muted hover:text-foreground"
             }`}
           >
             {value === opt.value && (
               <motion.span
                 layoutId={`toggle-${label}`}
-                className="absolute inset-0 bg-accent-primary rounded-lg"
+                className="absolute inset-0 bg-accent rounded-full"
                 transition={{ type: "spring", stiffness: 500, damping: 35 }}
               />
             )}
@@ -75,31 +49,6 @@ function PlanToggle({
           </button>
         ))}
       </div>
-    </div>
-  );
-}
-
-function PriceDisplay({
-  price,
-  duration,
-}: {
-  price: number;
-  duration: Duration;
-}) {
-  return (
-    <div className="flex items-baseline gap-1 my-4">
-      <span className="text-text-secondary text-lg">$</span>
-      <motion.span
-        key={price}
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="font-display font-bold text-5xl text-text-primary"
-      >
-        {price}
-      </motion.span>
-      <span className="text-text-muted text-sm">
-        {duration === "subscription" ? "/mo" : " one-time"}
-      </span>
     </div>
   );
 }
@@ -119,79 +68,127 @@ function PlanCard({
 }) {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true });
-  const meta = planMeta[plan];
   const planData = PLANS[plan];
   const price = PRICES[plan][duration][devices];
-  const Icon = meta.icon;
-  const isPopular = plan === "pro";
+
+  const isPro = plan === "pro";
+  const isElite = plan === "elite";
+
+  // Card surface styles
+  const cardClass = isPro
+    ? "bg-accent border-accent text-white"
+    : isElite
+      ? "bg-inverted border-inverted text-inverted-foreground"
+      : "bg-white border-border text-foreground";
+
+  const mutedClass = isPro
+    ? "text-white/70"
+    : isElite
+      ? "text-inverted-muted"
+      : "text-muted";
+
+  const checkBg = isPro
+    ? "bg-white/20"
+    : isElite
+      ? "bg-white/10"
+      : "bg-foreground/5";
+
+  const checkColor = isPro
+    ? "text-white"
+    : isElite
+      ? "text-white"
+      : "text-foreground";
+
+  const devicePill = isPro
+    ? "bg-white/10 border-white/15"
+    : isElite
+      ? "bg-white/5 border-white/10"
+      : "bg-background border-border";
+
+  const ctaClass = isPro
+    ? "bg-white text-foreground hover:bg-white/90"
+    : isElite
+      ? "bg-accent text-white hover:bg-[#4F52D6]"
+      : "bg-foreground text-white hover:bg-foreground/90";
 
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, y: 40 }}
+      initial={{ opacity: 0, y: 28 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.5, delay: index * 0.1 }}
-      className={`relative card-surface p-8 flex flex-col ${
-        isPopular
-          ? "border-accent-primary shadow-[0_0_40px_rgba(102,126,234,0.15)]"
-          : "border-border"
-      } hover:border-border-glow transition-all duration-300`}
+      transition={{ duration: 0.5, delay: index * 0.08, ease: [0.22, 1, 0.36, 1] }}
+      className={`relative flex flex-col p-8 md:p-10 rounded-2xl border ${cardClass}`}
     >
-      {/* Popular badge */}
-      {meta.badge && (
+      {/* Badge */}
+      {isPro && (
         <div className="absolute -top-3 left-1/2 -translate-x-1/2">
-          <span
-            className="px-4 py-1 rounded-full text-xs font-semibold text-white"
-            style={{ backgroundColor: meta.accentColor }}
-          >
-            {meta.badge}
+          <span className="px-4 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-foreground text-white">
+            Most Popular
+          </span>
+        </div>
+      )}
+      {isElite && (
+        <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+          <span className="px-4 py-1 rounded-full text-[11px] font-black uppercase tracking-widest bg-accent text-white">
+            Best Value
           </span>
         </div>
       )}
 
-      {/* Header */}
-      <div className="flex items-start justify-between mb-2">
-        <div>
-          <div
-            className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
-            style={{ backgroundColor: `${meta.accentColor}20` }}
-          >
-            <Icon size={18} style={{ color: meta.accentColor }} />
-          </div>
-          <h3 className="font-display font-bold text-2xl text-text-primary">
-            {planData.name}
-          </h3>
-          <p className="text-text-muted text-sm mt-0.5">{meta.tagline}</p>
-        </div>
+      {/* Name + tagline */}
+      <div className="mb-6">
+        <h3 className="font-display font-black text-2xl tracking-tight">
+          {planData.name}
+        </h3>
+        <p className={`text-sm font-medium mt-1 ${mutedClass}`}>
+          {plan === "basic" && "Get started fast"}
+          {plan === "pro" && "For serious prospectors"}
+          {plan === "elite" && "Unlimited everything"}
+        </p>
       </div>
 
       {/* Price */}
-      <PriceDisplay price={price} duration={duration} />
-
-      {/* Device info */}
-      <div className="flex items-center gap-2 mb-6 py-2 px-3 bg-bg-elevated rounded-lg border border-border">
-        <div
-          className="w-1.5 h-1.5 rounded-full"
-          style={{ backgroundColor: meta.accentColor }}
-        />
-        <span className="text-text-secondary text-xs">
-          {devices === "1" ? "1 device" : "Unlimited devices"}
-          {" · "}
-          {duration === "lifetime" ? "Lifetime access" : "Monthly billing"}
+      <div className="flex items-baseline gap-1.5 mb-6">
+        <span className={`text-lg font-bold ${mutedClass}`}>$</span>
+        <motion.span
+          key={price}
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="font-display font-black text-5xl md:text-6xl tracking-tight"
+        >
+          {price}
+        </motion.span>
+        <span className={`text-sm font-bold ${mutedClass}`}>
+          {duration === "subscription" ? "/mo" : " one-time"}
         </span>
       </div>
 
+      {/* Device / billing pill */}
+      <div
+        className={`flex items-center gap-2 mb-8 py-2.5 px-3.5 rounded-xl border text-xs font-bold uppercase tracking-wide ${devicePill} ${mutedClass}`}
+      >
+        <span
+          className={`w-1.5 h-1.5 rounded-full ${
+            isPro || isElite ? "bg-white" : "bg-accent"
+          }`}
+        />
+        {devices === "1" ? "1 device" : "Unlimited devices"}
+        {" · "}
+        {duration === "lifetime" ? "Lifetime access" : "Monthly billing"}
+      </div>
+
       {/* Features */}
-      <ul className="space-y-3 flex-1 mb-8">
+      <ul className="space-y-3.5 flex-1 mb-10">
         {planData.features.map((feature) => (
-          <li key={feature} className="flex items-center gap-3">
+          <li key={feature} className="flex items-start gap-3">
             <div
-              className="w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: `${meta.accentColor}20` }}
+              className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${checkBg}`}
             >
-              <Check size={10} style={{ color: meta.accentColor }} />
+              <Check size={11} strokeWidth={3} className={checkColor} />
             </div>
-            <span className="text-text-secondary text-sm">{feature}</span>
+            <span className={`text-[15px] font-medium leading-snug ${isPro || isElite ? "text-white/90" : "text-foreground/80"}`}>
+              {feature}
+            </span>
           </li>
         ))}
       </ul>
@@ -199,11 +196,7 @@ function PlanCard({
       {/* CTA */}
       <button
         onClick={() => onSelect(plan)}
-        className={`w-full py-4 rounded-xl font-semibold text-sm tracking-wide uppercase transition-all duration-300 ${
-          isPopular
-            ? "bg-gradient-accent text-white hover:shadow-[0_8px_30px_rgba(102,126,234,0.4)] hover:-translate-y-0.5"
-            : "bg-bg-elevated border border-border text-text-primary hover:border-border-active hover:text-accent-primary"
-        }`}
+        className={`w-full py-4 rounded-full font-bold text-sm tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] ${ctaClass}`}
       >
         Get {planData.name}
       </button>
@@ -219,48 +212,38 @@ export function PricingSection() {
   const [selectedPlan, setSelectedPlan] = useState<PlanKey | null>(null);
 
   return (
-    <section className="min-h-screen pt-28 pb-24 relative" ref={ref}>
-      {/* Background */}
-      <div className="absolute inset-0 bg-gradient-to-b from-accent-primary/5 via-transparent to-transparent pointer-events-none" />
+    <section className="min-h-screen pt-28 pb-32 bg-background relative" ref={ref}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative">
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
         {/* Header */}
-        <div className="text-center mb-16">
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={inView ? { opacity: 1 } : {}}
-            className="inline-flex items-center gap-2 border border-border bg-bg-surface px-4 py-1.5 rounded-full text-xs font-medium text-text-secondary uppercase tracking-widest mb-6"
+        <div className="text-center mb-14">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.5 }}
+            className="font-display font-black text-display-sm md:text-display-md text-foreground mb-5 tracking-tight"
           >
-            Simple Pricing
-          </motion.div>
-
-          <h1 className="font-display font-bold text-5xl md:text-7xl text-text-primary mb-4">
-            <VerticalCutReveal
-              splitBy="words"
-              staggerDuration={0.12}
-              containerClassName="justify-center"
-            >
-              One tool. Real leads.
-            </VerticalCutReveal>
-          </h1>
+            One tool.{" "}
+            <span className="accent-block">Real leads.</span>
+          </motion.h1>
 
           <motion.p
-            initial={{ opacity: 0, y: 10 }}
+            initial={{ opacity: 0, y: 12 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ delay: 0.4 }}
-            className="text-text-secondary text-lg max-w-xl mx-auto"
+            transition={{ delay: 0.15 }}
+            className="text-muted text-lg max-w-xl mx-auto font-medium"
           >
-            No hidden fees. No seat limits on team plans. Pay once, own it
-            forever — or go monthly and cancel anytime.
+            No hidden fees. No seat limits. Pay once, own it forever.
+            Or go monthly and cancel anytime.
           </motion.p>
         </div>
 
         {/* Toggles */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 16 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-16"
+          transition={{ delay: 0.2 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-6 mb-6"
         >
           <PlanToggle
             label="Billing"
@@ -285,30 +268,28 @@ export function PricingSection() {
           />
         </motion.div>
 
-        {/* Selected config summary */}
+        {/* Config summary */}
         <AnimatePresence mode="wait">
-          <motion.div
+          <motion.p
             key={`${duration}-${devices}`}
-            initial={{ opacity: 0, y: -8 }}
+            initial={{ opacity: 0, y: -6 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="text-center mb-10"
+            className="text-center text-sm text-muted font-medium mb-12"
           >
-            <span className="text-text-muted text-sm">
-              Showing{" "}
-              <span className="text-accent-primary font-medium">
-                {duration === "lifetime" ? "lifetime" : "monthly"}{" "}
-              </span>
-              prices for{" "}
-              <span className="text-accent-primary font-medium">
-                {devices === "1" ? "1 device" : "unlimited devices"}
-              </span>
+            Showing{" "}
+            <span className="text-foreground font-bold">
+              {duration === "lifetime" ? "lifetime" : "monthly"}
+            </span>{" "}
+            prices for{" "}
+            <span className="text-foreground font-bold">
+              {devices === "1" ? "1 device" : "unlimited devices"}
             </span>
-          </motion.div>
+          </motion.p>
         </AnimatePresence>
 
-        {/* Plan cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
+        {/* Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 md:gap-6 mb-16">
           {planOrder.map((plan, index) => (
             <PlanCard
               key={plan}
@@ -321,88 +302,19 @@ export function PricingSection() {
           ))}
         </div>
 
-        {/* Price breakdown table */}
+        {/* Trust row — matches landing CTA */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.5 }}
-          className="card-surface overflow-hidden mb-16"
+          initial={{ opacity: 0 }}
+          animate={inView ? { opacity: 1 } : {}}
+          transition={{ delay: 0.4 }}
+          className="flex flex-wrap items-center justify-center gap-4 md:gap-6 text-[10px] md:text-[11px] font-bold text-muted uppercase tracking-[0.2em]"
         >
-          <div className="p-6 border-b border-border">
-            <h3 className="font-display font-semibold text-text-primary">
-              Full Pricing Breakdown
-            </h3>
-            <p className="text-text-muted text-sm mt-1">
-              All prices in USD
-            </p>
-          </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-border bg-bg-elevated">
-                  <th className="text-left p-4 text-text-muted font-medium">
-                    Plan
-                  </th>
-                  <th className="p-4 text-center text-text-muted font-medium">
-                    Lifetime · 1 Device
-                  </th>
-                  <th className="p-4 text-center text-text-muted font-medium">
-                    Lifetime · Unlimited
-                  </th>
-                  <th className="p-4 text-center text-text-muted font-medium">
-                    Monthly · 1 Device
-                  </th>
-                  <th className="p-4 text-center text-text-muted font-medium">
-                    Monthly · Unlimited
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {planOrder.map((plan, i) => (
-                  <tr
-                    key={plan}
-                    className={`border-b border-border last:border-0 ${
-                      i % 2 === 0 ? "bg-bg-elevated/30" : ""
-                    }`}
-                  >
-                    <td className="p-4 font-semibold text-text-primary">
-                      {PLANS[plan].name}
-                    </td>
-                    <td className="p-4 text-center text-text-secondary">
-                      ${PRICES[plan].lifetime["1"]}
-                    </td>
-                    <td className="p-4 text-center text-text-secondary">
-                      ${PRICES[plan].lifetime.unlimited}
-                    </td>
-                    <td className="p-4 text-center text-text-secondary">
-                      ${PRICES[plan].subscription["1"]}/mo
-                    </td>
-                    <td className="p-4 text-center text-text-secondary">
-                      ${PRICES[plan].subscription.unlimited}/mo
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <span>Pay once, own forever</span>
+          <span className="w-1 h-1 bg-muted/50 rounded-full" />
+          <span>License delivered in hours</span>
+          <span className="w-1 h-1 bg-muted/50 rounded-full" />
+          <span>Runs 100% offline</span>
         </motion.div>
-
-        {/* Trust badges */}
-        <div className="flex flex-wrap items-center justify-center gap-6">
-          {[
-            { icon: Shield, text: "7-day refund guarantee" },
-            { icon: Zap, text: "License delivered within hours" },
-            { icon: Check, text: "No subscription required" },
-          ].map(({ icon: Icon, text }) => (
-            <div
-              key={text}
-              className="flex items-center gap-2 text-text-muted text-sm"
-            >
-              <Icon size={14} className="text-accent-primary" />
-              {text}
-            </div>
-          ))}
-        </div>
       </div>
 
       {/* Order modal */}

@@ -8,7 +8,7 @@ export default function Refund() {
       <Navbar />
       <LegalPage
         title="Refund Policy"
-        lastUpdated="January 2025"
+        lastUpdated="August 2026"
         sections={refundContent}
       />
       <Footer />

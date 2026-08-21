@@ -42,16 +42,16 @@ const actionIcons: Record<string, React.ElementType> = {
 };
 
 const actionColors: Record<string, string> = {
-  approved_order: "#38ef7d",
-  rejected_order: "#ff6464",
-  generated_license: "#667eea",
-  updated_license: "#764ba2",
-  exported_licenses: "#47C9FF",
-  bulk_suspended: "#f7e479",
-  bulk_revoked: "#ff6464",
-  bulk_activated: "#38ef7d",
-  bulk_reset_hardware: "#764ba2",
-  viewed_screenshot: "#888899",
+  approved_order: "#10B981",
+  rejected_order: "#EF4444",
+  generated_license: "#6366F1",
+  updated_license: "#8B5CF6",
+  exported_licenses: "#0EA5E9",
+  bulk_suspended: "#F59E0B",
+  bulk_revoked: "#EF4444",
+  bulk_activated: "#10B981",
+  bulk_reset_hardware: "#6366F1",
+  viewed_screenshot: "#6B6B6B",
 };
 
 function formatAction(action: string): string {
@@ -98,51 +98,45 @@ export function AuditLogTable({
       year: "numeric",
       hour: "2-digit",
       minute: "2-digit",
-      second: "2-digit",
     });
-
-  const formatDetails = (details: Record<string, unknown> | null): string => {
-    if (!details) return "";
-    const entries = Object.entries(details);
-    if (entries.length === 0) return "";
-    return entries
-      .map(([key, val]) => `${key}: ${JSON.stringify(val)}`)
-      .join(" · ");
-  };
 
   return (
     <div className="space-y-6">
+      
       {/* Header */}
       <div>
-        <h1 className="font-display font-bold text-2xl text-text-primary flex items-center gap-2">
-          <Shield size={20} className="text-accent-primary" />
+        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-3">
+          Security Audits
+        </span>
+        <h1 className="text-2xl font-display font-black text-foreground tracking-tight flex items-center gap-3">
+          <Shield size={20} className="text-accent" />
           Audit Log
         </h1>
-        <p className="text-text-muted text-sm mt-1">
-          {totalCount} total event{totalCount !== 1 ? "s" : ""} recorded
+        <p className="text-muted text-xs font-bold uppercase tracking-widest mt-1">
+          {totalCount} events indexed overall
         </p>
       </div>
 
       {/* Action filters */}
-      <div className="flex flex-wrap gap-2">
+      <div className="flex flex-wrap gap-2 pb-2">
         <button
           onClick={() => handleActionFilter("all")}
-          className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${
+          className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
             currentAction === "all"
-              ? "bg-accent-primary/15 text-accent-primary border-accent-primary/30"
-              : "bg-bg-surface border-border text-text-secondary hover:text-text-primary"
+              ? "bg-accent border-accent text-white"
+              : "bg-white border-border text-muted hover:text-foreground"
           }`}
         >
-          All Actions
+          All Events
         </button>
         {availableActions.map((action) => (
           <button
             key={action}
             onClick={() => handleActionFilter(action)}
-            className={`px-3 py-2 rounded-xl text-xs font-medium transition-all border ${
+            className={`px-4 py-2 rounded-full text-xs font-bold uppercase tracking-wider transition-all border ${
               currentAction === action
-                ? "bg-accent-primary/15 text-accent-primary border-accent-primary/30"
-                : "bg-bg-surface border-border text-text-secondary hover:text-text-primary"
+                ? "bg-accent border-accent text-white"
+                : "bg-white border-border text-muted hover:text-foreground"
             }`}
           >
             {formatAction(action)}
@@ -151,105 +145,99 @@ export function AuditLogTable({
       </div>
 
       {/* Log entries */}
-      <div className="card-surface overflow-hidden">
+      <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
         {logs.length === 0 ? (
           <div className="p-16 text-center">
-            <Shield size={32} className="text-text-muted mx-auto mb-3" />
-            <p className="text-text-secondary font-medium">
-              No audit events found
-            </p>
+            <Shield size={32} className="text-muted mx-auto mb-4" />
+            <p className="text-foreground font-black text-lg">No security events match criteria.</p>
           </div>
         ) : (
-          <div className="divide-y divide-border">
+          <div className="divide-y divide-border/60">
             {logs.map((log, i) => {
-              const Icon =
-                actionIcons[log.action] || FileText;
-              const color = actionColors[log.action] || "#888899";
+              const Icon = actionIcons[log.action] || FileText;
+              const color = actionColors[log.action] || "#6B6B6B";
 
               return (
                 <motion.div
                   key={log.id}
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.02 }}
-                  className="flex items-start gap-4 p-4 hover:bg-bg-elevated/50 transition-colors"
+                  transition={{ delay: i * 0.015 }}
+                  className="flex flex-col md:flex-row md:items-center gap-4 p-6 hover:bg-background/30 transition-colors"
                 >
-                  {/* Icon */}
-                  <div
-                    className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5"
-                    style={{ backgroundColor: `${color}15` }}
-                  >
-                    <Icon size={14} style={{ color }} />
-                  </div>
+                  <div className="flex items-start gap-4 flex-1 min-w-0">
+                    <div
+                      className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 mt-0.5"
+                      style={{ backgroundColor: `${color}15` }}
+                    >
+                      <Icon size={16} style={{ color }} />
+                    </div>
 
-                  {/* Content */}
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-start justify-between gap-4">
-                      <div>
-                        <p className="text-text-primary text-sm font-medium">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
+                        <p className="text-foreground text-sm font-black tracking-tight">
                           {formatAction(log.action)}
                         </p>
-                        <p className="text-text-muted text-xs mt-0.5">
-                          by{" "}
-                          <span className="text-text-secondary">
-                            {log.admin_email}
-                          </span>
+                        <p className="text-muted text-[10px] font-bold uppercase tracking-widest">
+                          by {log.admin_email}
                         </p>
                       </div>
-                      <p className="text-text-muted text-xs flex-shrink-0 text-right">
-                        {formatDate(log.created_at)}
-                      </p>
-                    </div>
 
-                    {/* Details */}
-                    <div className="flex flex-wrap gap-2 mt-2">
-                      {log.target_type && (
-                        <span className="bg-bg-elevated border border-border rounded-md px-2 py-0.5 text-xs text-text-muted">
-                          {log.target_type}
-                        </span>
-                      )}
-                      {log.target_id && (
-                        <span className="bg-bg-elevated border border-border rounded-md px-2 py-0.5 text-xs text-text-muted font-mono truncate max-w-48">
-                          {log.target_id.length > 36
-                            ? `${log.target_id.slice(0, 36)}...`
-                            : log.target_id}
-                        </span>
-                      )}
-                    </div>
+                      {/* Details row metadata */}
+                      <div className="flex flex-wrap gap-2 mt-3">
+                        {log.target_type && (
+                          <span className="bg-background border border-border rounded-lg px-2.5 py-0.5 text-[9px] font-black uppercase tracking-wider text-muted">
+                            {log.target_type}
+                          </span>
+                        )}
+                        {log.target_id && (
+                          <span className="bg-background border border-border rounded-lg px-2.5 py-0.5 text-[10px] font-mono text-foreground tracking-tight truncate max-w-xs">
+                            {log.target_id}
+                          </span>
+                        )}
+                        {log.ip_address && (
+                          <span className="bg-background border border-border rounded-lg px-2.5 py-0.5 text-[10px] font-mono text-muted tracking-tight">
+                            IP: {log.ip_address}
+                          </span>
+                        )}
+                      </div>
 
-                    {/* Expanded details */}
-                    {log.details &&
-                      Object.keys(log.details).length > 0 && (
-                        <div className="mt-2 bg-bg-elevated border border-border rounded-lg p-3">
-                          <pre className="text-text-muted text-xs font-mono whitespace-pre-wrap break-all">
+                      {/* Preformatted details metadata */}
+                      {log.details && Object.keys(log.details).length > 0 && (
+                        <div className="mt-3 bg-background border border-border/80 rounded-xl p-4 overflow-x-auto">
+                          <pre className="text-foreground text-[11px] font-mono whitespace-pre-wrap break-all">
                             {JSON.stringify(log.details, null, 2)}
                           </pre>
                         </div>
                       )}
+                    </div>
                   </div>
+
+                  <p className="text-muted text-xs font-bold uppercase tracking-widest shrink-0 md:text-right">
+                    {formatDate(log.created_at)}
+                  </p>
                 </motion.div>
               );
             })}
           </div>
         )}
 
-        {/* Pagination */}
+        {/* Pagination bar */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between p-4 border-t border-border">
-            <p className="text-text-muted text-xs">
-              Page {currentPage} of {totalPages} · {totalCount} total events
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-6 border-t border-border/60 bg-white">
+            <p className="text-muted text-xs font-bold uppercase tracking-widest">
+              Page {currentPage} of {totalPages} &middot; {totalCount} total entries
             </p>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => handlePageChange(currentPage - 1)}
                 disabled={currentPage <= 1}
-                className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-lg text-text-secondary text-xs hover:border-border-glow hover:text-text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="flex items-center gap-1 px-4 py-2 border border-border rounded-full text-foreground hover:border-accent text-xs font-black uppercase tracking-widest transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-border"
               >
                 <ChevronLeft size={12} />
                 Prev
               </button>
 
-              {/* Page numbers */}
               <div className="flex gap-1">
                 {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
                   let pageNum: number;
@@ -267,10 +255,10 @@ export function AuditLogTable({
                     <button
                       key={pageNum}
                       onClick={() => handlePageChange(pageNum)}
-                      className={`w-8 h-8 rounded-lg text-xs font-medium transition-all ${
+                      className={`w-8 h-8 rounded-full text-xs font-black transition-all ${
                         currentPage === pageNum
-                          ? "bg-accent-primary text-white"
-                          : "text-text-secondary hover:text-text-primary hover:bg-bg-elevated"
+                          ? "bg-accent text-white"
+                          : "text-muted hover:text-foreground hover:bg-background"
                       }`}
                     >
                       {pageNum}
@@ -282,7 +270,7 @@ export function AuditLogTable({
               <button
                 onClick={() => handlePageChange(currentPage + 1)}
                 disabled={currentPage >= totalPages}
-                className="flex items-center gap-1 px-3 py-1.5 border border-border rounded-lg text-text-secondary text-xs hover:border-border-glow hover:text-text-primary transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="flex items-center gap-1 px-4 py-2 border border-border rounded-full text-foreground hover:border-accent text-xs font-black uppercase tracking-widest transition-colors disabled:opacity-30 disabled:cursor-not-allowed disabled:hover:border-border"
               >
                 Next
                 <ChevronRight size={12} />

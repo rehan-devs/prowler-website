@@ -2,32 +2,95 @@
 
 import { motion } from "framer-motion";
 import Link from "next/link";
-import { Zap } from "lucide-react";
+import { ArrowRight, Zap } from "lucide-react";
+import { InlineAnnotation } from "@/components/ui/visual-anchors";
 
 export default function NotFound() {
   return (
-    <div className="min-h-screen bg-bg-deep flex items-center justify-center px-4">
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-center max-w-md"
-      >
-        <div className="w-16 h-16 rounded-2xl bg-gradient-accent flex items-center justify-center mx-auto mb-8">
-          <Zap size={28} className="text-white" />
-        </div>
-        <h1 className="font-display font-bold text-7xl text-text-primary mb-4">
-          404
-        </h1>
-        <p className="text-text-secondary text-lg mb-8">
-          This page does not exist. Maybe it got scraped away.
-        </p>
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-accent text-white rounded-xl font-semibold text-sm tracking-wide uppercase hover:shadow-[0_8px_30px_rgba(102,126,234,0.4)] transition-all"
+    <div className="min-h-screen bg-background flex flex-col items-center justify-center px-4 relative overflow-hidden text-center">
+      
+      {/* Background visual elements */}
+      <div className="max-w-xl mx-auto flex flex-col items-center z-10">
+        
+        {/* Brand Icon */}
+        <motion.div
+          initial={{ opacity: 0, scale: 0.8 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+          className="w-14 h-14 rounded-2xl bg-accent flex items-center justify-center mb-8 shadow-sm"
         >
-          Back to Home
-        </Link>
-      </motion.div>
+          <Zap size={24} className="text-white" />
+        </motion.div>
+
+        {/* 404 Heading with Inline Annotation */}
+        <motion.h1
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="font-display font-black text-[7rem] md:text-[9rem] leading-[0.9] tracking-[-0.04em] text-foreground mb-6"
+        >
+          40
+          <span className="relative inline-block">
+            4
+            <span className="hidden sm:block absolute top-0 right-0 w-0 h-0">
+              <InlineAnnotation
+                text="lead not found"
+                delay={0.5}
+                path="M 0,0 Q 45,-40 100,-18"
+                svgStyles={{ top: "10%", left: "60%" }}
+                textStyles={{
+                  top: "-12px",
+                  left: "105px",
+                  transform: "rotate(5deg)",
+                }}
+              />
+            </span>
+          </span>
+        </motion.h1>
+
+        {/* Description */}
+        <motion.p
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-muted text-lg md:text-xl font-medium max-w-md mb-10 leading-relaxed"
+        >
+          This page does not exist. It may have been removed, renamed, or{" "}
+          <span className="accent-block">scraped away.</span>
+        </motion.p>
+
+        {/* Back to Home Button (Matches the hero button) */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
+          <Link
+            href="/"
+            className="group flex items-center gap-4 bg-accent text-white pl-8 pr-2 py-2 rounded-full font-bold text-sm tracking-wider uppercase hover:bg-[#4F52D6] transition-colors"
+          >
+            Back to Home
+            <span className="w-10 h-10 bg-foreground rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-200">
+              <ArrowRight size={16} className="text-white" />
+            </span>
+          </Link>
+        </motion.div>
+
+        {/* Trust row footer metadata */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.4 }}
+          className="flex flex-wrap items-center justify-center gap-4 text-[10px] font-bold text-muted uppercase tracking-[0.2em] mt-16"
+        >
+          <span>Prowler.io Desktop</span>
+          <span className="w-1 h-1 bg-muted/50 rounded-full" />
+          <span>Offline Architecture</span>
+          <span className="w-1 h-1 bg-muted/50 rounded-full" />
+          <span>Local Data Only</span>
+        </motion.div>
+
+      </div>
     </div>
   );
 }

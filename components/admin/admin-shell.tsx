@@ -19,46 +19,22 @@ import {
 } from "lucide-react";
 
 const navItems = [
-  {
-    href: "/admin",
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    exact: true,
-  },
-  {
-    href: "/admin/orders",
-    label: "Orders",
-    icon: ShoppingCart,
-    badge: "pending",
-  },
-  {
-    href: "/admin/licenses",
-    label: "Licenses",
-    icon: Key,
-  },
-  {
-    href: "/admin/generate",
-    label: "Generate Key",
-    icon: PlusSquare,
-  },
-  {
-    href: "/admin/customers",
-    label: "Customers",
-    icon: Users,
-  },
-  {
-    href: "/admin/audit",
-    label: "Audit Log",
-    icon: Shield,
-  },
+  { href: "/admin", label: "Dashboard", icon: LayoutDashboard, exact: true },
+  { href: "/admin/orders", label: "Orders", icon: ShoppingCart, badge: "pending" },
+  { href: "/admin/licenses", label: "Licenses", icon: Key },
+  { href: "/admin/generate", label: "Generate Key", icon: PlusSquare },
+  { href: "/admin/customers", label: "Customers", icon: Users },
+  { href: "/admin/audit", label: "Audit Log", icon: Shield },
 ];
 
 function NavItem({
   item,
   pendingCount,
+  onNavigate,
 }: {
   item: (typeof navItems)[0];
   pendingCount?: number;
+  onNavigate?: () => void;
 }) {
   const pathname = usePathname();
   const isActive = item.exact
@@ -69,21 +45,22 @@ function NavItem({
   return (
     <Link
       href={item.href}
-      className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all duration-200 group ${
+      onClick={onNavigate}
+      className={`flex items-center gap-3 px-4 py-3 rounded-xl text-xs font-black uppercase tracking-wider transition-all duration-200 group ${
         isActive
-          ? "bg-accent-primary/15 text-accent-primary"
-          : "text-text-secondary hover:text-text-primary hover:bg-bg-elevated"
+          ? "bg-accent text-white"
+          : "text-muted hover:text-foreground hover:bg-white border border-transparent hover:border-border"
       }`}
     >
-      <Icon size={16} />
+      <Icon size={14} />
       <span>{item.label}</span>
       {item.badge === "pending" && pendingCount && pendingCount > 0 ? (
-        <span className="ml-auto bg-accent-hot text-white text-xs font-bold px-2 py-0.5 rounded-full">
+        <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
           {pendingCount}
         </span>
       ) : (
         isActive && (
-          <ChevronRight size={12} className="ml-auto text-accent-primary" />
+          <ChevronRight size={12} className="ml-auto text-white/70" />
         )
       )}
     </Link>
@@ -99,7 +76,7 @@ export function AdminShell({
 }) {
   const router = useRouter();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const [pendingCount] = useState(0); // Will be updated by dashboard
+  const [pendingCount] = useState(0);
 
   const handleLogout = async () => {
     await fetch("/api/admin/auth/logout", { method: "POST" });
@@ -107,48 +84,53 @@ export function AdminShell({
     router.refresh();
   };
 
-  const Sidebar = () => (
-    <div className="flex flex-col h-full">
-      {/* Logo */}
-      <div className="flex items-center gap-2 px-4 py-5 border-b border-border">
-        <div className="w-8 h-8 rounded-lg bg-gradient-accent flex items-center justify-center">
+  const Sidebar = ({ onNavigate }: { onNavigate?: () => void }) => (
+    <div className="flex flex-col h-full bg-white border-r border-border">
+      {/* Branding */}
+      <div className="flex items-center gap-3 px-6 py-5 border-b border-border/60">
+        <div className="w-8 h-8 rounded-xl bg-accent flex items-center justify-center shrink-0">
           <Zap size={14} className="text-white" />
         </div>
         <div>
-          <span className="font-display font-bold text-text-primary text-sm">
-            Prowler<span className="text-accent-primary">.io</span>
+          <span className="font-display font-black text-foreground text-sm tracking-tight block">
+            Prowler<span className="text-accent">.io</span>
           </span>
-          <p className="text-text-muted text-xs">Admin Panel</p>
+          <p className="text-muted text-[9px] font-black uppercase tracking-widest">Admin Control</p>
         </div>
       </div>
 
       {/* Nav */}
-      <nav className="flex-1 p-3 space-y-1 overflow-y-auto">
+      <nav className="flex-1 p-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => (
-          <NavItem key={item.href} item={item} pendingCount={pendingCount} />
+          <NavItem
+            key={item.href}
+            item={item}
+            pendingCount={pendingCount}
+            onNavigate={onNavigate}
+          />
         ))}
       </nav>
 
-      {/* Admin info + logout */}
-      <div className="p-3 border-t border-border">
-        <div className="flex items-center gap-3 px-3 py-2 mb-1">
-          <div className="w-8 h-8 rounded-full bg-accent-primary/20 flex items-center justify-center">
-            <span className="text-accent-primary text-xs font-bold uppercase">
+      {/* Footer Meta */}
+      <div className="p-4 border-t border-border/60">
+        <div className="flex items-center gap-3 px-3 py-2 mb-3 bg-background border border-border rounded-xl">
+          <div className="w-7 h-7 rounded-full bg-accent/10 flex items-center justify-center shrink-0">
+            <span className="text-accent text-xs font-black uppercase">
               {adminEmail[0]}
             </span>
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-text-primary text-xs font-medium truncate">
+            <p className="text-foreground text-[11px] font-black truncate leading-tight">
               {adminEmail}
             </p>
-            <p className="text-text-muted text-xs">Administrator</p>
+            <p className="text-muted text-[8px] font-bold uppercase tracking-widest mt-0.5">Admin Operator</p>
           </div>
         </div>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-text-secondary hover:text-accent-hot hover:bg-accent-hot/10 transition-all"
+          className="w-full flex items-center justify-center gap-2 py-3 bg-red-50 hover:bg-red-100/60 border border-red-200/50 text-red-700 rounded-full text-xs font-black uppercase tracking-widest transition-colors"
         >
-          <LogOut size={16} />
+          <LogOut size={13} />
           Sign Out
         </button>
       </div>
@@ -156,13 +138,14 @@ export function AdminShell({
   );
 
   return (
-    <div className="min-h-screen bg-bg-deep flex">
-      {/* Desktop sidebar */}
-      <aside className="hidden lg:flex w-60 flex-col bg-bg-surface border-r border-border fixed inset-y-0 left-0 z-30">
+    <div className="min-h-screen bg-background flex text-foreground">
+      
+      {/* Desktop Sidebar */}
+      <aside className="hidden lg:flex w-64 flex-col fixed inset-y-0 left-0 z-30">
         <Sidebar />
       </aside>
 
-      {/* Mobile sidebar */}
+      {/* Mobile Drawer */}
       <AnimatePresence>
         {mobileOpen && (
           <>
@@ -170,40 +153,42 @@ export function AdminShell({
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-black/60 z-40 lg:hidden"
+              className="fixed inset-0 bg-foreground/45 backdrop-blur-xs z-40 lg:hidden"
               onClick={() => setMobileOpen(false)}
             />
             <motion.aside
-              initial={{ x: -240 }}
+              initial={{ x: -260 }}
               animate={{ x: 0 }}
-              exit={{ x: -240 }}
+              exit={{ x: -260 }}
               transition={{ type: "spring", stiffness: 400, damping: 40 }}
-              className="fixed inset-y-0 left-0 w-60 bg-bg-surface border-r border-border z-50 lg:hidden"
+              className="fixed inset-y-0 left-0 w-64 z-50 lg:hidden"
             >
-              <Sidebar />
+              <Sidebar onNavigate={() => setMobileOpen(false)} />
             </motion.aside>
           </>
         )}
       </AnimatePresence>
 
-      {/* Main content */}
-      <div className="flex-1 lg:ml-60 flex flex-col min-h-screen">
-        {/* Mobile header */}
-        <header className="lg:hidden flex items-center justify-between px-4 py-3 bg-bg-surface border-b border-border">
+      {/* Content Space */}
+      <div className="flex-1 lg:ml-64 flex flex-col min-h-screen">
+        {/* Mobile Navbar */}
+        <header className="lg:hidden flex items-center justify-between px-6 py-4 bg-white border-b border-border">
           <button
             onClick={() => setMobileOpen(true)}
-            className="text-text-secondary hover:text-text-primary"
+            className="text-foreground hover:text-accent transition-colors"
           >
             <Menu size={20} />
           </button>
-          <span className="font-display font-bold text-text-primary text-sm">
-            Admin
+          <span className="font-display font-black text-foreground text-sm uppercase tracking-wider">
+            Admin Console
           </span>
           <div className="w-8" />
         </header>
 
-        {/* Page content */}
-        <main className="flex-1 p-4 md:p-6 lg:p-8">{children}</main>
+        {/* Dynamic Outlet */}
+        <main className="flex-1 p-6 md:p-8 lg:p-10 max-w-7xl w-full mx-auto">
+          {children}
+        </main>
       </div>
     </div>
   );

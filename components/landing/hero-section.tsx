@@ -1,163 +1,163 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { ArrowRight, MapPin, Globe, Search, Users } from "lucide-react";
 import Link from "next/link";
-import Velaris from "@/components/ui/velaris";
-import { HeroHighlight } from "@/components/ui/hero-highlight";
-import { ProwlerButton } from "@/components/ui/prowler-button";
+import { ArrowRight } from "lucide-react";
+import { InlineAnnotation, StatBubble } from "@/components/ui/visual-anchors";
 
-const floatingBadges = [
-  { icon: MapPin, label: "Google Maps", color: "#667eea", delay: 0 },
-  { icon: Globe, label: "Yellow Pages", color: "#764ba2", delay: 0.2 },
-  { icon: Search, label: "Bing Places", color: "#ff6464", delay: 0.4 },
-  { icon: Users, label: "Owner Finder", color: "#38ef7d", delay: 0.6 },
+const sources = [
+  "GOOGLE MAPS",
+  "YELP",
+  "YELLOW PAGES",
+  "BING PLACES",
+  "LINKEDIN",
+  "FACEBOOK",
+  "INSTAGRAM",
+  "STATE REGISTRIES",
 ];
 
 export function HeroSection() {
   return (
-    <HeroHighlight containerClassName="min-h-screen">
-      <Velaris
-        bg="#05050a"
-        colors={["#667eea", "#764ba2", "#1a1a2e", "#0d0d14"]}
-        speed={1.2}
-        grain={0.35}
-        height="100vh"
-        className="absolute inset-0"
-      >
-        <div />
-      </Velaris>
+    <section className="relative pt-12 md:pt-16 pb-0 overflow-hidden bg-background">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 relative min-h-[70vh] flex flex-col items-center justify-center">
+        <div className="hidden lg:block absolute inset-0 pointer-events-none">
+          <StatBubble
+            value="10,247"
+            label="Leads Extracted"
+            type="count"
+            rotation="-6deg"
+            className="top-[15%] left-[5%]"
+            delay={0.4}
+          />
+          <StatBubble
+            value="97%"
+            label="Accuracy Rate"
+            type="count"
+            rotation="4deg"
+            className="top-[10%] right-[8%]"
+            delay={0.6}
+          />
+          <StatBubble
+            value="2.3s"
+            label="Avg Scrape Time"
+            type="progress"
+            rotation="6deg"
+            className="bottom-[35%] left-[8%]"
+            delay={0.8}
+          />
+          <StatBubble
+            value="50+"
+            label="Data Sources"
+            type="count"
+            rotation="-4deg"
+            className="bottom-[40%] right-[10%]"
+            delay={1.0}
+          />
+        </div>
 
-      {/* Content */}
-      <div className="relative z-10 flex flex-col items-center justify-center min-h-screen text-center px-4 pt-16">
-        {/* Badge */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          className="inline-flex items-center gap-2 border border-border-glow bg-bg-surface/80 backdrop-blur px-4 py-2 rounded-full text-xs font-medium text-text-secondary uppercase tracking-widest mb-8"
-        >
-          <span className="w-1.5 h-1.5 rounded-full bg-accent-success" />
-          Professional Lead Generation Software
-        </motion.div>
-
-        {/* Headline */}
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.1 }}
-          className="font-display font-bold text-5xl md:text-7xl lg:text-8xl text-text-primary max-w-5xl leading-tight mb-6"
-        >
-          Find Your Next{" "}
-          <span className="shine-text">10,000 Customers</span>{" "}
-          Tonight
-        </motion.h1>
-
-        {/* Subheadline */}
-        <motion.p
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.2 }}
-          className="text-text-secondary text-lg md:text-xl max-w-2xl mb-10 leading-relaxed"
-        >
-          Prowler scrapes verified business leads from Google Maps, Yelp, Yellow
-          Pages and 50+ directories. Finds owner names, emails and social
-          profiles automatically.
-        </motion.p>
-
-        {/* CTAs */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center gap-4 mb-16"
-        >
-          <ProwlerButton
-            size="lg"
-            onClick={() => (window.location.href = "/pricing")}
+        <div className="w-full max-w-4xl flex flex-col items-center text-center z-10 relative mt-10">
+          <motion.h1
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-display-sm md:text-display-md lg:text-[6.5rem] leading-[0.95] tracking-[-0.04em] text-foreground font-black mb-8"
           >
-            Get Prowler Now
-          </ProwlerButton>
-          <Link
-            href="/download"
-            className="flex items-center gap-2 text-text-secondary hover:text-text-primary transition-colors text-sm font-medium group"
-          >
-            Free Trial Available
-            <ArrowRight
-              size={14}
-              className="group-hover:translate-x-1 transition-transform"
-            />
-          </Link>
-        </motion.div>
+            {/* F → built for pros (long curve left-up) */}
+            <span className="relative">
+              F
+              <InlineAnnotation
+                text="built for pros"
+                delay={1.2}
+                path="M 0,0 Q -50,-70 -120,-45"
+                svgStyles={{ top: "10%", left: "0%" }}
+                textStyles={{
+                  top: "-58px",
+                  left: "-210px",
+                  transform: "rotate(-8deg)",
+                }}
+              />
+            </span>
+            ind{" "}
+            <span className="accent-block">
+              lead
+              <span className="relative">
+                s.
+                {/* s → runs locally (long curve right-up) */}
+                <InlineAnnotation
+                  text="runs locally"
+                  delay={1.4}
+                  path="M 0,0 Q 45,-40 100,-18"
+                  svgStyles={{ top: "5%", left: "60%" }}
+                  textStyles={{
+                    top: "-10px",
+                    left: "105px",
+                    transform: "rotate(5deg)",
+                  }}
+                />
+              </span>
+            </span>
+            <br />
+            Close deals.
+          </motion.h1>
 
-        {/* Source badges */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1, delay: 0.5 }}
-          className="flex flex-wrap items-center justify-center gap-3 mb-16"
-        >
-          {floatingBadges.map(({ icon: Icon, label, color, delay }) => (
-            <motion.div
-              key={label}
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ delay: 0.5 + delay, type: "spring" }}
-              className="flex items-center gap-2 bg-bg-surface/80 backdrop-blur border border-border px-3 py-2 rounded-full text-xs text-text-secondary"
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.2 }}
+            className="text-muted text-lg md:text-xl max-w-xl mb-10 font-medium leading-relaxed"
+          >
+            Prowler scrapes verified business contacts from 50+ directories. Runs
+            entirely on your desktop.
+          </motion.p>
+
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            className="relative"
+          >
+            <Link
+              href="/pricing"
+              className="group flex items-center gap-4 bg-accent text-white pl-8 pr-2 py-2 rounded-full font-bold text-sm tracking-wider uppercase transition-colors hover:bg-[#4F52D6]"
             >
-              <Icon size={12} style={{ color }} />
-              {label}
-            </motion.div>
-          ))}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 1.1, type: "spring" }}
-            className="flex items-center gap-2 bg-bg-surface/80 backdrop-blur border border-border px-3 py-2 rounded-full text-xs text-text-secondary"
-          >
-            + 50 more sources
-          </motion.div>
-        </motion.div>
+              Get Prowler
+              {/* Annotation on the LINK, not inside the arrow circle */}
+              <span className="relative w-10 h-10 bg-foreground rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-200">
+                <ArrowRight size={16} className="text-white" />
+              </span>
+            </Link>
 
-        {/* Stats */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, delay: 0.7 }}
-          className="grid grid-cols-3 gap-8 max-w-lg w-full"
-        >
-          {[
-            { value: "50+", label: "Data Sources" },
-            { value: "10k+", label: "Leads Per Hour" },
-            { value: "97%", label: "Accuracy Rate" },
-          ].map(({ value, label }) => (
-            <div key={label} className="text-center">
-              <div className="font-display font-bold text-3xl text-gradient mb-1">
-                {value}
-              </div>
-              <div className="text-text-muted text-xs uppercase tracking-wider">
-                {label}
-              </div>
-            </div>
-          ))}
-        </motion.div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.5 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-        >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ duration: 2, repeat: Infinity }}
-            className="w-5 h-8 border border-border rounded-full flex items-start justify-center p-1"
-          >
-            <div className="w-1 h-2 bg-accent-primary rounded-full" />
+            {/* Separate anchor to the RIGHT of the button — line never crosses the pill */}
+            <span className="hidden md:block absolute top-1/2 -right-2 w-0 h-0">
+              <InlineAnnotation
+                text="no monthly fees"
+                delay={1.6}
+                path="M 0,0 Q 50,45 110,30"
+                svgStyles={{ top: "0%", left: "0%" }}
+                textStyles={{
+                  top: "22px",
+                  left: "100px",
+                  transform: "rotate(-4deg)",
+                }}
+              />
+            </span>
           </motion.div>
-        </motion.div>
+        </div>
       </div>
-    </HeroHighlight>
+
+      <div className="relative z-20 bg-background border-t border-border mt-12 md:mt-16 pb-12">
+        <div className="flex overflow-hidden py-6 bg-background">
+          <div className="flex w-max animate-marquee">
+            {[...sources, ...sources, ...sources].map((source, i) => (
+              <div key={i} className="flex items-center">
+                <span className="text-2xl md:text-3xl font-display font-black text-muted/20 whitespace-nowrap px-8 uppercase tracking-tight">
+                  {source}
+                </span>
+                <span className="w-2 h-2 rounded-full bg-accent/40" />
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </section>
   );
 }

@@ -11,7 +11,7 @@ const faqs = [
   },
   {
     q: "How does the license system work?",
-    a: "After payment, you receive a license key in your email. Enter it in the desktop app on first launch. The license binds to your hardware automatically. For the All Devices plan, you can activate on unlimited machines.",
+    a: "After payment, you receive a license key by email. Enter it in the desktop app on first launch. The license binds to your hardware automatically. All Devices plans can activate on unlimited machines.",
   },
   {
     q: "Is my data private? Do you store my scraped leads?",
@@ -23,75 +23,71 @@ const faqs = [
   },
   {
     q: "How is Prowler different from Apollo or Hunter?",
-    a: "Apollo and Hunter are subscription databases with static data. Prowler scrapes live, real-time data from the source. You get fresh leads, not data that is months old. Plus it is a one-time purchase.",
-  },
-  {
-    q: "What payment methods do you accept?",
-    a: "We accept bank transfer, EasyPaisa and JazzCash. After payment, send a screenshot through the order form and your license will be delivered within hours.",
-  },
-  {
-    q: "Do subscriptions auto-renew?",
-    a: "No. Subscriptions are manual. You pay each month and submit a renewal request through the same form. We send your renewed license before your current one expires.",
-  },
-  {
-    q: "Is there a refund policy?",
-    a: "Yes, we offer a 7-day refund if Prowler does not work on your system and our support team cannot resolve the issue. See our Refund Policy for full details.",
+    a: "Apollo and Hunter are subscription databases with static data. Prowler scrapes live, real-time data from the source. You get fresh leads, not data that is months old. Plus it can be a one-time purchase.",
   },
 ];
 
-function FaqItem({ q, a }: { q: string; a: string }) {
+function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border-b border-border last:border-0">
+    <motion.div
+      initial={{ opacity: 0, y: 16 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.05 }}
+      className="border-b border-inverted-muted/30"
+    >
       <button
-        className="w-full flex items-center justify-between py-5 text-left gap-4"
+        className="w-full flex items-center justify-between py-8 text-left gap-6 group"
         onClick={() => setOpen(!open)}
       >
-        <span className="font-medium text-text-primary">{q}</span>
-        <motion.div
-          animate={{ rotate: open ? 45 : 0 }}
-          transition={{ duration: 0.2 }}
-          className="flex-shrink-0 w-6 h-6 rounded-full border border-border flex items-center justify-center"
+        <span className="font-display font-black text-lg md:text-xl text-inverted-foreground tracking-tight group-hover:text-accent transition-colors">
+          {q}
+        </span>
+        <div
+          className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 transition-transform duration-300 ${
+            open
+              ? "border-accent rotate-45 text-accent"
+              : "border-inverted-muted text-inverted-muted group-hover:border-inverted-foreground group-hover:text-inverted-foreground"
+          }`}
         >
-          <Plus size={12} className="text-text-secondary" />
-        </motion.div>
+          <Plus size={16} strokeWidth={2.5} />
+        </div>
       </button>
-      <AnimatePresence>
+
+      <AnimatePresence initial={false}>
         {open && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
             className="overflow-hidden"
           >
-            <p className="text-text-secondary text-sm leading-relaxed pb-5">
+            <p className="text-inverted-muted text-lg leading-relaxed font-medium pb-8 max-w-3xl">
               {a}
             </p>
           </motion.div>
         )}
       </AnimatePresence>
-    </div>
+    </motion.div>
   );
 }
 
 export function FaqSection() {
   return (
-    <section className="py-24 relative">
-      <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center mb-16">
-          <div className="inline-flex items-center gap-2 border border-border bg-bg-surface px-4 py-1.5 rounded-full text-xs font-medium text-text-secondary uppercase tracking-widest mb-6">
-            FAQ
-          </div>
-          <h2 className="font-display font-bold text-4xl md:text-5xl text-text-primary">
-            Common questions
+    <section className="section-padding bg-inverted">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="mb-16 md:mb-20">
+          {/* FAQS eyebrow removed */}
+          <h2 className="text-display-sm md:text-display-md text-inverted-foreground">
+            Common questions.
           </h2>
         </div>
-
-        <div className="card-surface p-6 md:p-8">
-          {faqs.map((faq) => (
-            <FaqItem key={faq.q} q={faq.q} a={faq.a} />
+        <div>
+          {faqs.map((faq, i) => (
+            <FaqItem key={faq.q} q={faq.q} a={faq.a} index={i} />
           ))}
         </div>
       </div>

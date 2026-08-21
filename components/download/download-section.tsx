@@ -1,8 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
-import { Monitor, Apple, Terminal, Download, AlertCircle, CheckCircle } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Monitor, Apple, Terminal, Download, AlertCircle, Check } from "lucide-react";
+import { InlineAnnotation } from "@/components/ui/visual-anchors";
 
 type OS = "windows" | "mac" | "linux";
 
@@ -10,46 +11,40 @@ const osData = {
   windows: {
     icon: Monitor,
     label: "Windows",
-    version: "Windows 10 / 11",
+    version: "Windows 10 / 11 (64-bit)",
     file: "Prowler.io-Setup.exe",
-    size: "~85 MB",
-    color: "#667eea",
+    size: "84.2 MB",
     instructions: [
-      "Download the installer below",
-      "Install Python 3.12 from python.org if not already installed",
-      "Run Prowler.io-Setup.exe",
-      "Launch Prowler.io from your desktop",
-      "Enter your license key when prompted",
+      "Download the custom Windows package installer below.",
+      "Ensure Python 3.12+ is configured and installed on system path.",
+      "Launch Prowler.io-Setup.exe and bypass Windows SmartScreen warnings.",
+      "Enter your hardware licensing token upon initial sandbox initialization.",
     ],
   },
   mac: {
     icon: Apple,
     label: "macOS",
-    version: "macOS 12 Monterey or later",
+    version: "Apple Silicon & Intel (macOS 12+)",
     file: "Prowler.io.dmg",
-    size: "~90 MB",
-    color: "#764ba2",
+    size: "91.5 MB",
     instructions: [
-      "Download the DMG file below",
-      "Install Python 3.12 from python.org",
-      "Open the DMG and drag Prowler.io to Applications",
-      "Right-click → Open (first launch only, to allow unknown developer)",
-      "Enter your license key when prompted",
+      "Download the Apple Disk Image file below.",
+      "Verify homebrew version or install standalone Python 3.12 binaries.",
+      "Mount disk image, drag Prowler app block to applications.",
+      "Perform Control-click on binary interface to allow unidentified developers.",
     ],
   },
   linux: {
     icon: Terminal,
     label: "Linux",
-    version: "Ubuntu 20.04+ / Debian 11+",
+    version: "Ubuntu 20.04+ / Debian Stable",
     file: "prowler-io.deb",
-    size: "~80 MB",
-    color: "#ff6464",
+    size: "78.1 MB",
     instructions: [
-      "Download the .deb package below",
-      "Install Python 3.12: sudo apt install python3.12",
-      "Install the package: sudo dpkg -i prowler-io.deb",
-      "Run from terminal: prowler-io",
-      "Enter your license key when prompted",
+      "Fetch the raw debian architecture package below.",
+      "Confirm Python package installation: sudo apt install python3.12-venv.",
+      "Run standard terminal install scripts: sudo dpkg -i prowler-io.deb.",
+      "Launch using executable prowler-io directly inside bash command line.",
     ],
   },
 };
@@ -73,140 +68,144 @@ export function DownloadSection() {
   const Icon = current.icon;
 
   return (
-    <section className="min-h-screen pt-28 pb-24 px-4">
-      <div className="max-w-4xl mx-auto">
+    <section className="min-h-screen pt-32 pb-24 bg-background relative overflow-hidden">
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-16"
-        >
-          <div className="inline-flex items-center gap-2 border border-border bg-bg-surface px-4 py-1.5 rounded-full text-xs font-medium text-text-secondary uppercase tracking-widest mb-6">
-            Latest Version: 1.0.0
-          </div>
-          <h1 className="font-display font-bold text-5xl md:text-6xl text-text-primary mb-4">
-            Download{" "}
-            <span className="text-gradient">Prowler.io</span>
-          </h1>
-          <p className="text-text-secondary text-lg max-w-xl mx-auto">
-            A desktop app that runs locally on your machine. Your data never
-            leaves your computer.
-          </p>
-        </motion.div>
+  initial={{ opacity: 0, y: 20 }}
+  animate={{ opacity: 1, y: 0 }}
+  className="text-center mb-16 relative"
+>
+  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-4">
+    Stable Desktop Releases
+  </span>
+  <h1 className="text-display-sm md:text-display-md text-foreground mb-4 leading-none tracking-tight">
+    Prowler{" "}
+    <span className="relative inline-block">
+      for
+      <span className="hidden md:block absolute top-0 right-0 w-0 h-0">
+        <InlineAnnotation
+          text="version 1.0.0 is live"
+          delay={0.6}
+          path="M 0,0 Q 45,-40 100,-18"
+          svgStyles={{ top: "5%", left: "80%" }}
+          textStyles={{
+            top: "-12px",
+            left: "110px",
+            transform: "rotate(5deg)",
+          }}
+        />
+      </span>
+    </span>{" "}
+    <span className="accent-block">desktop.</span>
+  </h1>
+  <p className="text-muted text-base font-medium max-w-xl mx-auto">
+    Zero cloud telemetry. Local sandbox execution. Complete domain ownership of your data files.
+  </p>
+</motion.div>
 
-        {/* OS Tabs */}
+        {/* Custom Pill Toggle Selector */}
         <div className="flex justify-center mb-8">
-          <div className="flex bg-bg-surface border border-border rounded-xl p-1 gap-1">
+          <div className="relative flex bg-white border border-border rounded-full p-1 shadow-sm">
             {(Object.keys(osData) as OS[]).map((os) => {
               const OsIcon = osData[os].icon;
+              const isSelected = activeOS === os;
               return (
                 <button
                   key={os}
                   onClick={() => setActiveOS(os)}
-                  className={`flex items-center gap-2 px-5 py-3 rounded-lg text-sm font-medium transition-all duration-200 ${
-                    activeOS === os
-                      ? "bg-bg-elevated text-text-primary shadow-sm"
-                      : "text-text-secondary hover:text-text-primary"
+                  className={`relative z-10 flex items-center gap-2 px-6 py-2.5 rounded-full text-xs font-bold uppercase tracking-wider transition-colors duration-200 ${
+                    isSelected ? "text-white" : "text-muted hover:text-foreground"
                   }`}
                 >
-                  <OsIcon size={14} />
-                  {osData[os].label}
-                  {activeOS === os && os === detectOS() && (
-                    <span className="text-xs bg-accent-success/20 text-accent-success px-1.5 py-0.5 rounded-full">
-                      Detected
-                    </span>
+                  {isSelected && (
+                    <motion.span
+                      layoutId="download-pill"
+                      className="absolute inset-0 bg-accent rounded-full"
+                      transition={{ type: "spring", stiffness: 500, damping: 35 }}
+                    />
                   )}
+                  <OsIcon size={14} className="relative z-10" />
+                  <span className="relative z-10">{osData[os].label}</span>
                 </button>
               );
             })}
           </div>
         </div>
 
-        {/* Download card */}
-        <motion.div
-          key={activeOS}
-          initial={{ opacity: 0, y: 10 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="card-surface p-8 mb-8"
-        >
-          <div className="flex flex-col md:flex-row items-center md:items-start gap-6">
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center flex-shrink-0"
-              style={{ backgroundColor: `${current.color}15` }}
-            >
-              <Icon size={28} style={{ color: current.color }} />
-            </div>
-
-            <div className="flex-1 text-center md:text-left">
-              <h2 className="font-display font-bold text-2xl text-text-primary mb-1">
-                Prowler.io for {current.label}
-              </h2>
-              <p className="text-text-muted text-sm mb-2">{current.version}</p>
-              <div className="flex items-center gap-4 justify-center md:justify-start text-xs text-text-muted mb-6">
-                <span>Version 1.0.0</span>
-                <span>·</span>
-                <span>{current.size}</span>
-                <span>·</span>
-                <span>Requires Python 3.12</span>
+        {/* Main Interface Block */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch mb-12">
+          
+          {/* Box Left */}
+          <div className="lg:col-span-7 bg-white border border-border rounded-2xl p-8 flex flex-col justify-between shadow-sm">
+            <div>
+              <div className="w-12 h-12 bg-accent/5 rounded-full flex items-center justify-center mb-6">
+                <Icon size={22} className="text-accent" />
               </div>
+              <h2 className="font-display font-black text-2xl text-foreground mb-1 tracking-tight">
+                Prowler Engine {current.label}
+              </h2>
+              <p className="text-muted text-sm font-medium mb-6">
+                {current.version} &middot; Stable Release v1.0.0
+              </p>
 
-              {/* Notice: installers not yet uploaded */}
-              <div className="flex items-start gap-3 bg-accent-gold/10 border border-accent-gold/30 rounded-xl p-4 mb-6">
-                <AlertCircle
-                  size={16}
-                  className="text-accent-gold flex-shrink-0 mt-0.5"
-                />
-                <p className="text-accent-gold text-sm">
-                  Installers will be available here once uploaded. Purchase a
-                  license and you will receive the download link directly in
-                  your email.
+              {/* Note banner */}
+              <div className="flex items-start gap-3 bg-accent/5 border border-accent/20 rounded-xl p-4 mb-8">
+                <AlertCircle size={16} className="text-accent shrink-0 mt-0.5" />
+                <p className="text-accent text-xs font-bold leading-normal">
+                  Installers require verification of system environment bindings. Read setup criteria on the right panel.
                 </p>
               </div>
-
-              <a
-                href={`/api/download/${activeOS}`}
-                className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-accent text-white rounded-xl font-semibold text-sm tracking-wide uppercase hover:shadow-[0_8px_30px_rgba(102,126,234,0.4)] hover:-translate-y-0.5 transition-all duration-300"
-              >
-                <Download size={16} />
-                Download for {current.label}
-              </a>
             </div>
-          </div>
-        </motion.div>
 
-        {/* Installation instructions */}
-        <div className="card-surface p-6 mb-8">
-          <h3 className="font-display font-semibold text-text-primary mb-4 flex items-center gap-2">
-            <CheckCircle size={16} className="text-accent-success" />
-            Installation Instructions for {current.label}
-          </h3>
-          <ol className="space-y-3">
-            {current.instructions.map((step, i) => (
-              <li key={i} className="flex items-start gap-3">
-                <span className="w-6 h-6 rounded-full bg-accent-primary/20 text-accent-primary text-xs font-bold flex items-center justify-center flex-shrink-0 mt-0.5">
-                  {i + 1}
-                </span>
-                <span className="text-text-secondary text-sm">{step}</span>
-              </li>
-            ))}
-          </ol>
+            <a
+              href={`/api/download/${activeOS}`}
+              className="group flex items-center justify-center gap-4 bg-accent text-white py-4 rounded-full font-bold text-xs tracking-wider uppercase hover:bg-[#4F52D6] transition-colors w-full"
+            >
+              Get Download Package
+              <span className="w-6 h-6 bg-foreground rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-200">
+                <Download size={11} className="text-white" />
+              </span>
+            </a>
+          </div>
+
+          {/* Box Right */}
+          <div className="lg:col-span-5 bg-white border border-border rounded-2xl p-8 flex flex-col justify-center shadow-sm">
+            <h3 className="font-display font-black text-[15px] text-foreground uppercase tracking-widest mb-6">
+              Installation steps.
+            </h3>
+            <ol className="space-y-4">
+              {current.instructions.map((step, idx) => (
+                <li key={idx} className="flex items-start gap-4">
+                  <div className="w-5 h-5 rounded-full bg-accent text-white text-[10px] font-bold flex items-center justify-center shrink-0 mt-0.5">
+                    {idx + 1}
+                  </div>
+                  <p className="text-muted text-xs font-semibold leading-relaxed">
+                    {step}
+                  </p>
+                </li>
+              ))}
+            </ol>
+          </div>
+
         </div>
 
-        {/* Python requirement */}
-        <div className="bg-bg-elevated border border-border-glow rounded-xl p-6 text-center">
-          <p className="text-text-secondary text-sm mb-3">
-            Prowler.io requires Python 3.12 to run the scraping engine.
+        {/* Python notice banner */}
+        <div className="border border-border rounded-2xl p-6 bg-white flex flex-col sm:flex-row items-center justify-between gap-4 shadow-sm">
+          <p className="text-muted text-xs font-bold uppercase tracking-wider text-center sm:text-left">
+            Python 3.12 engine setup environment is mandatory on host system path.
           </p>
           <a
             href="https://www.python.org/downloads/"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-2 text-accent-primary text-sm font-medium hover:underline"
+            className="text-xs font-black uppercase text-accent hover:underline tracking-widest flex items-center gap-1 shrink-0"
           >
-            Download Python 3.12 from python.org
-            <Download size={12} />
+            Install Python 3.12 &rarr;
           </a>
         </div>
+
       </div>
     </section>
   );

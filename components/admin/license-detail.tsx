@@ -12,7 +12,6 @@ import {
   Ban,
   CheckCircle,
   XCircle,
-  Clock,
   Loader2,
   AlertCircle,
   Activity,
@@ -63,12 +62,12 @@ function CopyButton({ value }: { value: string }) {
         setCopied(true);
         setTimeout(() => setCopied(false), 2000);
       }}
-      className="text-text-muted hover:text-accent-primary transition-colors"
+      className="text-muted hover:text-accent transition-colors shrink-0"
     >
       {copied ? (
-        <Check size={13} className="text-accent-success" />
+        <Check size={12} className="text-emerald-600" strokeWidth={3} />
       ) : (
-        <Copy size={13} />
+        <Copy size={12} />
       )}
     </button>
   );
@@ -76,43 +75,18 @@ function CopyButton({ value }: { value: string }) {
 
 const statusActions = {
   active: [
-    { label: "Suspend", action: "suspended", color: "accent-gold", icon: Ban },
-    {
-      label: "Revoke",
-      action: "revoked",
-      color: "accent-hot",
-      icon: XCircle,
-    },
+    { label: "Suspend Key", action: "suspended", color: "amber", icon: Ban },
+    { label: "Revoke Permanently", action: "revoked", color: "red", icon: XCircle },
   ],
   suspended: [
-    {
-      label: "Reactivate",
-      action: "active",
-      color: "accent-success",
-      icon: CheckCircle,
-    },
-    {
-      label: "Revoke",
-      action: "revoked",
-      color: "accent-hot",
-      icon: XCircle,
-    },
+    { label: "Activate Session", action: "active", color: "emerald", icon: CheckCircle },
+    { label: "Revoke Permanently", action: "revoked", color: "red", icon: XCircle },
   ],
   revoked: [
-    {
-      label: "Reactivate",
-      action: "active",
-      color: "accent-success",
-      icon: CheckCircle,
-    },
+    { label: "Reinstate Active Status", action: "active", color: "emerald", icon: CheckCircle },
   ],
   expired: [
-    {
-      label: "Reactivate",
-      action: "active",
-      color: "accent-success",
-      icon: CheckCircle,
-    },
+    { label: "Extend & Activate", action: "active", color: "emerald", icon: CheckCircle },
   ],
 };
 
@@ -163,24 +137,24 @@ export function LicenseDetail({
   };
 
   const handleResetHardware = () =>
-    updateLicense({ hardware_id: null }, "Hardware binding reset. User can now activate on a new machine.");
+    updateLicense({ hardware_id: null }, "Hardware token reset successfully. System unlocked for activation.");
 
   const handleStatusChange = (newStatus: string) =>
-    updateLicense({ status: newStatus }, `License ${newStatus} successfully.`);
+    updateLicense({ status: newStatus }, `License record updated to: ${newStatus}`);
 
   const handleSaveNotes = () =>
-    updateLicense({ notes }, "Notes saved.");
+    updateLicense({ notes }, "Internal administrative notes saved.");
 
   const handleSaveExpiry = () => {
     const expiresAt = newExpiry ? new Date(newExpiry).toISOString() : null;
-    updateLicense({ expires_at: expiresAt }, "Expiry date updated.");
+    updateLicense({ expires_at: expiresAt }, "Operational expiration bounds updated.");
     setEditingExpiry(false);
   };
 
   const formatDate = (d: string | null) => {
-    if (!d) return "Never";
+    if (!d) return "Never Expiring";
     return new Date(d).toLocaleString("en-US", {
-      month: "long",
+      month: "short",
       day: "numeric",
       year: "numeric",
       hour: "2-digit",
@@ -192,55 +166,58 @@ export function LicenseDetail({
     statusActions[license.status as keyof typeof statusActions] || [];
 
   const statusBadge = {
-    active: "bg-accent-success/10 border-accent-success/30 text-accent-success",
-    suspended: "bg-accent-gold/10 border-accent-gold/30 text-accent-gold",
-    revoked: "bg-accent-hot/10 border-accent-hot/30 text-accent-hot",
-    expired: "bg-bg-elevated border-border text-text-muted",
+    active: "bg-emerald-500/10 border-emerald-500/30 text-emerald-700",
+    suspended: "bg-amber-500/10 border-amber-500/30 text-amber-700",
+    revoked: "bg-red-500/10 border-red-500/30 text-red-700",
+    expired: "bg-white border-border text-muted",
   };
 
   return (
     <div className="space-y-6 max-w-5xl">
-      {/* Header */}
-      <div className="flex items-center gap-4">
+      
+      {/* Breadcrumb back */}
+      <div>
         <Link
           href="/admin/licenses"
-          className="flex items-center gap-2 text-text-muted hover:text-text-primary transition-colors text-sm"
+          className="inline-flex items-center gap-1.5 text-muted hover:text-foreground text-xs font-black uppercase tracking-widest transition-colors mb-4"
         >
-          <ArrowLeft size={14} />
-          Back to Licenses
+          <ArrowLeft size={12} />
+          Back to licenses
         </Link>
       </div>
 
-      <div className="flex flex-wrap items-start justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="font-display font-bold text-2xl text-text-primary">
-            License Detail
+          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-3">
+            Detailed Core State
+          </span>
+          <h1 className="text-2xl font-display font-black text-foreground tracking-tight leading-none">
+            License Records
           </h1>
-          <p className="text-text-muted text-sm font-mono mt-1">
-            {license.id}
+          <p className="text-muted text-xs font-mono font-bold mt-1.5">
+            UID: {license.id}
           </p>
         </div>
         <div
-          className={`px-3 py-1.5 rounded-xl text-sm font-medium border ${
-            statusBadge[license.status as keyof typeof statusBadge] ||
-            statusBadge.expired
+          className={`px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest border ${
+            statusBadge[license.status as keyof typeof statusBadge] || statusBadge.expired
           }`}
         >
-          {license.status.charAt(0).toUpperCase() + license.status.slice(1)}
+          {license.status}
         </div>
       </div>
 
-      {/* Alerts */}
+      {/* Dynamic alerts */}
       <AnimatePresence>
         {success && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex items-center gap-2 bg-accent-success/10 border border-accent-success/30 rounded-xl px-4 py-3"
+            className="flex items-center gap-2.5 bg-emerald-50 border border-emerald-200 rounded-2xl px-5 py-3.5"
           >
-            <CheckCircle size={14} className="text-accent-success" />
-            <p className="text-accent-success text-sm">{success}</p>
+            <CheckCircle size={14} className="text-emerald-600 shrink-0" />
+            <p className="text-emerald-700 text-xs font-bold leading-none">{success}</p>
           </motion.div>
         )}
         {error && (
@@ -248,65 +225,39 @@ export function LicenseDetail({
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0 }}
-            className="flex items-center gap-2 bg-accent-hot/10 border border-accent-hot/30 rounded-xl px-4 py-3"
+            className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-2xl px-5 py-3.5"
           >
-            <AlertCircle size={14} className="text-accent-hot" />
-            <p className="text-accent-hot text-sm">{error}</p>
+            <AlertCircle size={14} className="text-red-600 shrink-0" />
+            <p className="text-red-600 text-xs font-bold leading-none">{error}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left column — details */}
-        <div className="lg:col-span-2 space-y-5">
-          {/* Core info */}
-          <div className="card-surface p-6">
-            <h2 className="font-display font-semibold text-text-primary mb-5">
-              License Information
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        
+        {/* Core parameters column */}
+        <div className="lg:col-span-8 space-y-6">
+          
+          {/* parameters Grid Box */}
+          <div className="bg-white border border-border rounded-2xl p-6 md:p-8 shadow-sm">
+            <h2 className="font-display font-black text-lg text-foreground tracking-tight mb-6">
+              Parameter Index
             </h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {[
-                {
-                  label: "Email",
-                  value: license.email || "Not set",
-                  copy: !!license.email,
-                },
-                {
-                  label: "Plan",
-                  value: `${license.plan.toUpperCase()} — ${
-                    license.plan_duration === "lifetime"
-                      ? "Lifetime"
-                      : "Monthly"
-                  }`,
-                },
-                {
-                  label: "Max Devices",
-                  value:
-                    license.max_machines === 999
-                      ? "Unlimited"
-                      : license.max_machines.toString(),
-                },
-                {
-                  label: "Activations",
-                  value: license.activation_count.toString(),
-                },
-                {
-                  label: "Created",
-                  value: formatDate(license.created_at),
-                },
-                {
-                  label: "Last Seen",
-                  value: formatDate(license.last_seen_at),
-                },
+                { label: "Target Client", value: license.email || "No email bound", copy: !!license.email },
+                { label: "Signature Tier", value: `${license.plan} &middot; ${license.plan_duration}` },
+                { label: "Machine Slots", value: license.max_machines === 999 ? "Unlimited" : `${license.max_machines} Device(s)` },
+                { label: "Activations Count", value: `${license.activation_count} sessions` },
+                { label: "Created Timestamp", value: formatDate(license.created_at) },
+                { label: "Telemetry Heartbeat", value: formatDate(license.last_seen_at) },
               ].map(({ label, value, copy }) => (
-                <div key={label}>
-                  <p className="text-text-muted text-xs uppercase tracking-wider mb-1">
+                <div key={label} className="border-b border-border/40 pb-4 last:border-0 last:pb-0">
+                  <p className="text-muted text-[9px] font-black uppercase tracking-wider mb-1">
                     {label}
                   </p>
                   <div className="flex items-center gap-2">
-                    <p className="text-text-primary text-sm font-medium">
-                      {value}
-                    </p>
+                    <p className="text-foreground text-sm font-black tracking-tight" dangerouslySetInnerHTML={{ __html: value }} />
                     {copy && <CopyButton value={value} />}
                   </div>
                 </div>
@@ -314,198 +265,183 @@ export function LicenseDetail({
             </div>
           </div>
 
-          {/* Key hash */}
-          <div className="card-surface p-6">
-            <div className="flex items-center justify-between mb-3">
-              <h2 className="font-display font-semibold text-text-primary">
-                Key Hash (HMAC-SHA256)
+          {/* Cryptographic block hash */}
+          <div className="bg-white border border-border rounded-2xl p-6 md:p-8 shadow-sm">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <h2 className="font-display font-black text-lg text-foreground tracking-tight">
+                Cryptographic Signature State
               </h2>
               <button
                 onClick={() => setShowHash(!showHash)}
-                className="flex items-center gap-1.5 text-text-muted hover:text-text-primary transition-colors text-xs"
+                className="flex items-center gap-1 text-muted hover:text-foreground text-xs font-black uppercase tracking-widest transition-colors"
               >
                 {showHash ? <EyeOff size={12} /> : <Eye size={12} />}
-                {showHash ? "Hide" : "Reveal"}
+                {showHash ? "Hide" : "Reveal Hash"}
               </button>
             </div>
-            <div className="flex items-center gap-3 bg-bg-elevated border border-border rounded-xl p-4">
-              <code className="font-mono text-text-secondary text-xs flex-1 break-all">
+            <div className="flex items-center gap-3 bg-background border border-border rounded-xl p-4">
+              <code className="font-mono text-foreground text-xs font-semibold flex-1 break-all select-all">
                 {showHash
                   ? license.key_hash
-                  : `${license.key_hash.slice(0, 16)}${"•".repeat(32)}${license.key_hash.slice(-8)}`}
+                  : `${license.key_hash.slice(0, 16)}••••••••••••••••••••••••${license.key_hash.slice(-8)}`}
               </code>
               {showHash && <CopyButton value={license.key_hash} />}
             </div>
-            <p className="text-text-muted text-xs mt-2">
-              The raw license key cannot be recovered. Only the hash is stored.
+            <p className="text-muted text-[10px] font-bold uppercase tracking-wider mt-3 leading-normal">
+              Internal HMAC state cannot be reversed to restore original plain text license strings.
             </p>
           </div>
 
-          {/* Hardware binding */}
-          <div className="card-surface p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-semibold text-text-primary">
-                Hardware Binding
+          {/* Host CPU binding */}
+          <div className="bg-white border border-border rounded-2xl p-6 md:p-8 shadow-sm">
+            <div className="flex items-center justify-between gap-4 mb-6">
+              <h2 className="font-display font-black text-lg text-foreground tracking-tight">
+                Hardware Binding State
               </h2>
               {license.hardware_id && (
                 <button
                   onClick={handleResetHardware}
                   disabled={loading}
-                  className="flex items-center gap-1.5 px-3 py-1.5 bg-accent-gold/10 border border-accent-gold/30 text-accent-gold rounded-lg text-xs font-medium hover:bg-accent-gold/20 transition-all disabled:opacity-50"
+                  className="flex items-center gap-1.5 px-4 py-2 bg-amber-500/10 border border-amber-500/30 text-amber-700 rounded-full text-xs font-black uppercase tracking-widest hover:bg-amber-500/20 transition-all"
                 >
                   {loading ? (
-                    <Loader2 size={11} className="animate-spin" />
+                    <Loader2 size={12} className="animate-spin" />
                   ) : (
-                    <RefreshCw size={11} />
+                    <RefreshCw size={12} />
                   )}
                   Reset Binding
                 </button>
               )}
             </div>
             {license.hardware_id ? (
-              <div className="bg-bg-elevated border border-border rounded-xl p-4">
-                <p className="text-text-muted text-xs mb-1">Bound to hardware ID</p>
+              <div className="bg-background border border-border rounded-xl p-4">
+                <p className="text-muted text-[9px] font-black uppercase tracking-wider mb-1">BOUND LOCAL HOST ID</p>
                 <div className="flex items-center gap-2">
-                  <code className="font-mono text-text-primary text-sm break-all">
+                  <code className="font-mono text-foreground text-xs font-black break-all select-all">
                     {license.hardware_id}
                   </code>
                   <CopyButton value={license.hardware_id} />
                 </div>
               </div>
             ) : (
-              <div className="bg-accent-success/5 border border-accent-success/20 rounded-xl p-4">
-                <p className="text-accent-success text-sm flex items-center gap-2">
+              <div className="bg-emerald-500/10 border border-emerald-500/20 rounded-xl p-4">
+                <p className="text-emerald-700 text-xs font-bold flex items-center gap-2">
                   <CheckCircle size={14} />
-                  Not bound — user can activate on any machine
+                  Available: Lock is clear for next device initialization setup.
                 </p>
               </div>
             )}
           </div>
 
-          {/* Expiry management */}
-          <div className="card-surface p-6">
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="font-display font-semibold text-text-primary">
-                Expiry Date
+          {/* Expiration date bounds */}
+          <div className="bg-white border border-border rounded-2xl p-6 md:p-8 shadow-sm">
+            <div className="flex items-center justify-between gap-4 mb-4">
+              <h2 className="font-display font-black text-lg text-foreground tracking-tight">
+                Expiration Bounds
               </h2>
               <button
                 onClick={() => setEditingExpiry(!editingExpiry)}
-                className="text-accent-primary text-xs hover:underline"
+                className="text-accent hover:text-[#4F52D6] text-xs font-black uppercase tracking-widest hover:underline"
               >
-                {editingExpiry ? "Cancel" : "Change"}
+                {editingExpiry ? "Cancel" : "Modify limits"}
               </button>
             </div>
             {editingExpiry ? (
-              <div className="flex gap-3">
+              <div className="flex flex-col sm:flex-row gap-3">
                 <input
                   type="date"
                   value={newExpiry}
                   onChange={(e) => setNewExpiry(e.target.value)}
-                  className="flex-1 bg-bg-elevated border border-border rounded-xl px-4 py-2.5 text-text-primary text-sm focus:outline-none focus:border-accent-primary transition-colors"
+                  className="flex-1 bg-background border border-border rounded-xl px-4 py-3 text-foreground text-xs font-bold focus:outline-none focus:border-accent"
                 />
                 <button
-                  onClick={() =>
-                    updateLicense({ expires_at: null }, "Set to lifetime.")
-                  }
+                  onClick={() => updateLicense({ expires_at: null }, "License reset to permanent lifetime bounds.")}
                   disabled={loading}
-                  className="px-3 py-2.5 border border-border rounded-xl text-text-secondary text-xs hover:border-border-glow transition-all"
+                  className="px-5 py-3 border border-border rounded-full text-foreground hover:border-accent text-xs font-black uppercase tracking-widest transition-colors bg-white"
                 >
-                  Lifetime
+                  Convert to lifetime
                 </button>
                 <button
                   onClick={handleSaveExpiry}
                   disabled={loading}
-                  className="px-4 py-2.5 bg-accent-primary/15 border border-accent-primary/30 text-accent-primary rounded-xl text-xs font-medium hover:bg-accent-primary/25 transition-all disabled:opacity-50"
+                  className="px-6 py-3 bg-accent text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-[#4F52D6] transition-colors"
                 >
-                  {loading ? (
-                    <Loader2 size={12} className="animate-spin" />
-                  ) : (
-                    "Save"
-                  )}
+                  {loading ? <Loader2 size={12} className="animate-spin" /> : "Apply Bounds"}
                 </button>
               </div>
             ) : (
-              <p className="text-text-primary font-medium">
-                {license.expires_at
-                  ? formatDate(license.expires_at)
-                  : "Lifetime (never expires)"}
+              <p className="text-foreground text-sm font-black tracking-tight">
+                {license.expires_at ? formatDate(license.expires_at) : "Lifetime (Permanent entitlement tier)"}
               </p>
             )}
           </div>
 
-          {/* Notes */}
-          <div className="card-surface p-6">
-            <h2 className="font-display font-semibold text-text-primary mb-3">
-              Internal Notes
+          {/* Core admin notes */}
+          <div className="bg-white border border-border rounded-2xl p-6 md:p-8 shadow-sm">
+            <h2 className="font-display font-black text-lg text-foreground tracking-tight mb-4">
+              Administrative Record Notes
             </h2>
             <textarea
               value={notes}
               onChange={(e) => setNotes(e.target.value)}
               rows={3}
-              placeholder="Add notes about this license..."
-              className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors resize-none mb-3"
+              placeholder="Track manual changes or verification IDs..."
+              className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground text-sm font-semibold focus:outline-none focus:border-accent resize-none mb-4"
             />
             <button
               onClick={handleSaveNotes}
               disabled={loading}
-              className="px-4 py-2 bg-accent-primary/15 border border-accent-primary/30 text-accent-primary rounded-xl text-xs font-medium hover:bg-accent-primary/25 transition-all disabled:opacity-50"
+              className="px-5 py-3 bg-accent text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-[#4F52D6] transition-colors"
             >
-              Save Notes
+              Save notes
             </button>
           </div>
 
-          {/* Usage logs */}
-          <div className="card-surface overflow-hidden">
-            <div className="flex items-center gap-2 p-5 border-b border-border">
-              <Activity size={14} className="text-accent-primary" />
-              <h2 className="font-display font-semibold text-text-primary">
-                Usage Logs
+          {/* Activity Logs */}
+          <div className="bg-white border border-border rounded-2xl shadow-sm overflow-hidden">
+            <div className="flex items-center gap-2 p-6 border-b border-border/60">
+              <Activity size={14} className="text-accent shrink-0" />
+              <h2 className="font-display font-black text-lg text-foreground tracking-tight">
+                Activity Logs
               </h2>
-              <span className="text-text-muted text-xs ml-1">
-                (last 20)
+              <span className="text-muted text-[10px] font-bold uppercase tracking-widest ml-1">
+                Last 20 operations
               </span>
             </div>
             {usageLogs.length === 0 ? (
-              <div className="p-8 text-center text-text-muted text-sm">
-                No activity recorded yet
+              <div className="p-8 text-center text-muted text-xs font-bold uppercase tracking-wider">
+                No tracking data retrieved.
               </div>
             ) : (
-              <div className="divide-y divide-border">
+              <div className="divide-y divide-border/60">
                 {usageLogs.map((log) => (
-                  <div
-                    key={log.id}
-                    className="flex items-center gap-4 px-5 py-3"
-                  >
-                    <div className="w-2 h-2 rounded-full bg-accent-primary flex-shrink-0" />
-                    <div className="flex-1 min-w-0">
-                      <p className="text-text-primary text-sm font-medium capitalize">
+                  <div key={log.id} className="flex items-center justify-between gap-4 p-5 hover:bg-background/20">
+                    <div className="min-w-0 flex-1">
+                      <p className="text-foreground text-xs font-black uppercase tracking-wider truncate">
                         {log.action.replace(/_/g, " ")}
                       </p>
-                      <p className="text-text-muted text-xs font-mono truncate">
-                        {log.hardware_id}
+                      <p className="text-muted text-[10px] font-mono truncate mt-0.5">
+                        HWID: {log.hardware_id}
                       </p>
                     </div>
-                    <p className="text-text-muted text-xs flex-shrink-0">
-                      {new Date(log.created_at).toLocaleString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        hour: "2-digit",
-                        minute: "2-digit",
-                      })}
+                    <p className="text-muted text-[10px] font-bold uppercase tracking-wider shrink-0">
+                      {new Date(log.created_at).toLocaleDateString()}
                     </p>
                   </div>
                 ))}
               </div>
             )}
           </div>
+
         </div>
 
-        {/* Right column — actions */}
-        <div className="space-y-5">
-          {/* Status actions */}
-          <div className="card-surface p-5">
-            <h2 className="font-display font-semibold text-text-primary mb-4">
-              Actions
+        {/* Status Actions Column */}
+        <div className="lg:col-span-4 space-y-6">
+          
+          {/* Actions card */}
+          <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+            <h2 className="font-display font-black text-base text-foreground tracking-tight mb-4">
+              State Operations
             </h2>
             <div className="space-y-2">
               {currentStatusActions.map(({ label, action, color, icon: Icon }) => (
@@ -513,18 +449,18 @@ export function LicenseDetail({
                   key={action}
                   onClick={() => handleStatusChange(action)}
                   disabled={loading}
-                  className={`w-full flex items-center gap-2 py-3 px-4 rounded-xl border text-sm font-medium transition-all disabled:opacity-50 ${
-                    color === "accent-success"
-                      ? "bg-accent-success/10 border-accent-success/30 text-accent-success hover:bg-accent-success/20"
-                      : color === "accent-gold"
-                      ? "bg-accent-gold/10 border-accent-gold/30 text-accent-gold hover:bg-accent-gold/20"
-                      : "bg-accent-hot/10 border-accent-hot/30 text-accent-hot hover:bg-accent-hot/20"
+                  className={`w-full flex items-center justify-center gap-2 py-3.5 px-4 rounded-full text-xs font-black uppercase tracking-wider transition-all ${
+                    color === "emerald"
+                      ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-700 hover:bg-emerald-500/20"
+                      : color === "amber"
+                      ? "bg-amber-500/10 border border-amber-500/30 text-amber-700 hover:bg-amber-500/20"
+                      : "bg-red-500/10 border border-red-500/30 text-red-700 hover:bg-red-500/20"
                   }`}
                 >
                   {loading ? (
-                    <Loader2 size={14} className="animate-spin" />
+                    <Loader2 size={12} className="animate-spin" />
                   ) : (
-                    <Icon size={14} />
+                    <Icon size={12} strokeWidth={3} />
                   )}
                   {label}
                 </button>
@@ -532,84 +468,59 @@ export function LicenseDetail({
             </div>
           </div>
 
-          {/* Linked order */}
+          {/* Linked order details */}
           {order && (
-            <div className="card-surface p-5">
+            <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
               <div className="flex items-center gap-2 mb-4">
-                <ShoppingCart size={14} className="text-accent-primary" />
-                <h2 className="font-display font-semibold text-text-primary">
-                  Linked Order
+                <ShoppingCart size={14} className="text-accent shrink-0" />
+                <h2 className="font-display font-black text-base text-foreground tracking-tight">
+                  Linked Order Proof
                 </h2>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between">
-                  <span className="text-text-muted text-xs">Customer</span>
-                  <span className="text-text-primary text-xs font-medium">
-                    {order.customer_name}
-                  </span>
+              <div className="space-y-3 mb-6">
+                <div className="flex justify-between items-baseline border-b border-border/40 pb-2">
+                  <span className="text-muted text-[10px] font-bold uppercase tracking-wider">Client</span>
+                  <span className="text-foreground text-xs font-black tracking-tight">{order.customer_name}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-muted text-xs">Amount</span>
-                  <span className="text-text-primary text-xs font-medium">
-                    ${order.amount_usd}
-                  </span>
+                <div className="flex justify-between items-baseline border-b border-border/40 pb-2">
+                  <span className="text-muted text-[10px] font-bold uppercase tracking-wider">Sum</span>
+                  <span className="text-foreground text-xs font-black tracking-tight">${order.amount_usd}</span>
                 </div>
-                <div className="flex justify-between">
-                  <span className="text-text-muted text-xs">Date</span>
-                  <span className="text-text-muted text-xs">
-                    {new Date(order.created_at).toLocaleDateString()}
-                  </span>
+                <div className="flex justify-between items-baseline">
+                  <span className="text-muted text-[10px] font-bold uppercase tracking-wider">Captured</span>
+                  <span className="text-muted text-[10px] font-mono font-bold">{new Date(order.created_at).toLocaleDateString()}</span>
                 </div>
               </div>
               <Link
                 href={`/admin/orders/${order.id}`}
-                className="mt-4 block text-center text-accent-primary text-xs hover:underline"
+                className="w-full block py-3 text-center border border-border hover:border-accent hover:text-accent rounded-full text-xs font-black uppercase tracking-wider transition-colors bg-white"
               >
-                View order →
+                Review transaction &rarr;
               </Link>
             </div>
           )}
 
-          {/* Quick info */}
-          <div className="card-surface p-5">
-            <h2 className="font-display font-semibold text-text-primary mb-4">
-              Quick Stats
+          {/* Quick Stats sidebar block */}
+          <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
+            <h2 className="font-display font-black text-base text-foreground tracking-tight mb-4">
+              Quick Telemetry
             </h2>
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
-                <span className="text-text-muted text-sm">Status</span>
-                <span className="text-text-primary text-sm capitalize font-medium">
-                  {license.status}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-text-muted text-sm">Activations</span>
-                <span className="text-text-primary text-sm font-medium">
-                  {license.activation_count} /{" "}
-                  {license.max_machines === 999 ? "∞" : license.max_machines}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-text-muted text-sm">Hardware</span>
-                <span
-                  className={`text-xs font-medium ${
-                    license.hardware_id
-                      ? "text-accent-gold"
-                      : "text-accent-success"
-                  }`}
-                >
-                  {license.hardware_id ? "Bound" : "Free"}
-                </span>
-              </div>
-              <div className="flex justify-between items-center">
-                <span className="text-text-muted text-sm">Expiry</span>
-                <span className="text-text-primary text-xs font-medium">
-                  {license.expires_at ? "Fixed date" : "Lifetime"}
-                </span>
-              </div>
+              {[
+                { label: "Operation state", value: license.status, style: "text-foreground font-black capitalize" },
+                { label: "Hardware bound", value: license.hardware_id ? "Bound (Locked)" : "Free (Unlocked)", style: license.hardware_id ? "text-amber-700 font-bold" : "text-emerald-700 font-bold" },
+                { label: "Limit Bounds", value: license.expires_at ? "Fixed Expiry" : "Permanent Lifetime", style: "text-foreground font-black" },
+              ].map(({ label, value, style }) => (
+                <div key={label} className="flex justify-between items-baseline border-b border-border/45 pb-2 last:border-0 last:pb-0">
+                  <span className="text-muted text-[10px] font-bold uppercase tracking-wider">{label}</span>
+                  <span className={`text-xs ${style}`}>{value}</span>
+                </div>
+              ))}
             </div>
           </div>
+
         </div>
+
       </div>
     </div>
   );

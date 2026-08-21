@@ -1,120 +1,75 @@
-@import url('https://api.fontshare.com/v2/css?f[]=satoshi@300,400,500,600,700,800,900&f[]=clash-display@400,500,600,700&display=swap');
+@import url('https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700,900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@600&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-  :root {
-    --background: 0 0% 2%;
-    --foreground: 0 0% 94%;
-    --card: 240 20% 6%;
-    --card-foreground: 0 0% 94%;
-    --popover: 240 20% 6%;
-    --popover-foreground: 0 0% 94%;
-    --primary: 234 70% 65%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 240 15% 10%;
-    --secondary-foreground: 0 0% 94%;
-    --muted: 240 15% 10%;
-    --muted-foreground: 240 10% 53%;
-    --accent: 240 15% 12%;
-    --accent-foreground: 0 0% 94%;
-    --destructive: 0 62% 60%;
-    --destructive-foreground: 0 0% 100%;
-    --border: 240 15% 15%;
-    --input: 240 15% 15%;
-    --ring: 234 70% 65%;
-    --radius: 0.75rem;
-  }
-
-  * {
-    border-color: #1e1e2e;
-  }
-
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
-
   body {
-    background-color: #05050a;
-    color: #f0f0f0;
-    font-family: "Satoshi", sans-serif;
-    -webkit-font-smoothing: antialiased;
+    @apply bg-background text-foreground font-sans antialiased selection:bg-accent selection:text-white;
   }
-
   h1, h2, h3, h4, h5, h6 {
-    font-family: "Clash Display", sans-serif;
-  }
-
-  ::-webkit-scrollbar {
-    width: 6px;
-  }
-
-  ::-webkit-scrollbar-track {
-    background: #05050a;
-  }
-
-  ::-webkit-scrollbar-thumb {
-    background: #1e1e2e;
-    border-radius: 3px;
-  }
-
-  ::-webkit-scrollbar-thumb:hover {
-    background: #667eea;
+    @apply font-display font-black tracking-tight;
   }
 }
 
 @layer utilities {
-  .text-gradient {
-    background-image: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  .eyebrow {
+    @apply text-[12px] md:text-[13px] font-bold uppercase tracking-[0.15em] text-muted;
   }
 
-  .text-gradient-hot {
-    background-image: linear-gradient(135deg, #ff6464 0%, #f7e479 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
+  /* NEW: Marker stroke highlight (No more blocky paint fills) */
+  .accent-block {
+    position: relative;
+    display: inline-block;
+    color: inherit; /* Keep text black/white */
+    z-index: 1;
+    white-space: nowrap;
+  }
+  
+  .accent-block::before {
+    content: "";
+    position: absolute;
+    bottom: 8%;
+    left: -4%;
+    right: -4%;
+    height: 45%;
+    background: #6366F1;
+    opacity: 0.8;
+    transform: skew(-8deg) rotate(-1.5deg);
+    z-index: -1;
+    border-radius: 3px;
+    /* Optional: blend mode makes it look more like ink on paper */
+    mix-blend-mode: multiply;
   }
 
-  .card-surface {
-    background-color: #0d0d14;
-    border: 1px solid #1e1e2e;
-    border-radius: 0.75rem;
+  .bg-inverted .accent-block::before {
+    mix-blend-mode: normal;
+    opacity: 0.9;
   }
 
-  .card-elevated {
-    background-color: #14141f;
-    border: 1px solid #2a2a4a;
-    border-radius: 0.75rem;
-  }
-
-  .glow-accent {
-    box-shadow: 0 0 30px rgba(102, 126, 234, 0.2);
-  }
-
-  .glow-hot {
-    box-shadow: 0 0 30px rgba(255, 100, 100, 0.2);
-  }
-
-  .shine-text {
-    background: linear-gradient(
-      90deg,
-      #667eea 0%,
-      #764ba2 25%,
-      #f0f0f0 50%,
-      #764ba2 75%,
-      #667eea 100%
-    );
-    background-size: 200% auto;
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    animation: shine 4s linear infinite;
+  .section-padding {
+    @apply py-20 md:py-24 lg:py-32;
   }
 }
 
-@keyframes shine {
-  0% { background-position: 200% center; }
-  100% { background-position: -200% center; }
+/* Lenis Recommended CSS */
+html.lenis, html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }

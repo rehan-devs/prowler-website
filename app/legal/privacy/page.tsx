@@ -8,7 +8,7 @@ export default function Privacy() {
       <Navbar />
       <LegalPage
         title="Privacy Policy"
-        lastUpdated="January 2025"
+        lastUpdated="August 2026"
         sections={privacyContent}
       />
       <Footer />

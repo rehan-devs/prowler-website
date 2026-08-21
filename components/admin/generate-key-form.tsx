@@ -67,7 +67,17 @@ export function GenerateKeyForm() {
   };
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-6 max-w-2xl mx-auto">
+      <div>
+        <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-3">
+          Instant Key Provisions
+        </span>
+        <h1 className="text-2xl font-display font-black text-foreground tracking-tight flex items-center gap-3">
+          <Key size={20} className="text-accent" />
+          Generate Keys
+        </h1>
+      </div>
+
       <AnimatePresence mode="wait">
         {generated ? (
           <motion.div
@@ -75,80 +85,65 @@ export function GenerateKeyForm() {
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0 }}
-            className="card-surface p-6 space-y-5"
+            className="bg-white border border-border rounded-2xl p-6 md:p-8 space-y-6 shadow-sm"
           >
             <div className="flex items-center gap-2">
-              <div className="w-8 h-8 rounded-xl bg-accent-success/20 flex items-center justify-center">
-                <Key size={14} className="text-accent-success" />
+              <div className="w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center">
+                <Check size={14} className="text-emerald-600" strokeWidth={3} />
               </div>
-              <p className="text-accent-success font-semibold">
-                License Key Generated
+              <p className="text-emerald-700 font-bold text-sm tracking-tight">
+                New Cryptographic Key Generated Successfully
               </p>
             </div>
 
             <div>
-              <p className="text-text-muted text-xs mb-2 uppercase tracking-wider">
-                License Key (shown once only)
+              <p className="text-muted text-[10px] font-bold uppercase tracking-widest mb-2">
+                License Key Token (Shown Once)
               </p>
-              <div className="flex items-center gap-3 bg-bg-deep border border-accent-success/30 rounded-xl p-4">
-                <code className="font-mono text-accent-success text-xl flex-1 tracking-widest">
+              <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-background border border-border rounded-xl p-4">
+                <code className="font-mono text-foreground text-base font-black tracking-widest flex-1 break-all">
                   {generated.key}
                 </code>
                 <button
                   onClick={handleCopy}
-                  className="flex items-center gap-1.5 px-3 py-2 bg-accent-success/15 border border-accent-success/30 rounded-lg text-accent-success text-xs font-medium hover:bg-accent-success/25 transition-all"
+                  className="flex items-center justify-center gap-1.5 px-4 py-2.5 bg-accent text-white rounded-full text-xs font-bold uppercase tracking-wider hover:bg-[#4F52D6] transition-colors shrink-0"
                 >
-                  {copied ? (
-                    <Check size={12} />
-                  ) : (
-                    <Copy size={12} />
-                  )}
-                  {copied ? "Copied!" : "Copy"}
+                  {copied ? <Check size={12} strokeWidth={3} /> : <Copy size={12} />}
+                  {copied ? "Copied" : "Copy Key"}
                 </button>
               </div>
             </div>
 
             <div className="grid grid-cols-3 gap-3 text-center">
               {[
-                { label: "Plan", value: generated.plan.toUpperCase() },
-                {
-                  label: "Duration",
-                  value:
-                    generated.duration === "lifetime"
-                      ? "Lifetime"
-                      : "Monthly",
-                },
-                {
-                  label: "Devices",
-                  value:
-                    generated.devices === "1" ? "1 Device" : "Unlimited",
-                },
+                { label: "Target Plan", value: generated.plan },
+                { label: "Duration Type", value: generated.duration },
+                { label: "Hardware Slots", value: generated.devices === "1" ? "1 Device" : "Unlimited" },
               ].map(({ label, value }) => (
                 <div
                   key={label}
-                  className="bg-bg-elevated border border-border rounded-xl p-3"
+                  className="bg-background border border-border rounded-xl p-4"
                 >
-                  <p className="text-text-muted text-xs mb-1">{label}</p>
-                  <p className="text-text-primary text-sm font-semibold">
+                  <p className="text-muted text-[9px] font-black uppercase tracking-wider mb-1">{label}</p>
+                  <p className="text-foreground text-xs font-black uppercase tracking-wide">
                     {value}
                   </p>
                 </div>
               ))}
             </div>
 
-            <div className="bg-accent-gold/10 border border-accent-gold/30 rounded-xl p-3">
-              <p className="text-accent-gold text-xs">
-                This key will not be shown again. Copy it now and send it
-                manually to the customer.
+            <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-4">
+              <p className="text-amber-800 text-xs font-bold leading-normal">
+                Important: Prowler records matching cryptographic state hashes only. Copy the raw string now as it cannot be reproduced later.
               </p>
             </div>
 
             <button
               onClick={handleReset}
-              className="w-full flex items-center justify-center gap-2 py-3 border border-border rounded-xl text-text-secondary text-sm hover:border-border-glow hover:text-text-primary transition-all"
+              className="w-full flex items-center justify-center gap-2 py-4 border border-border hover:border-accent hover:text-accent rounded-full text-xs font-black uppercase tracking-widest bg-white transition-colors"
             >
-              <RefreshCw size={14} />
-              Generate Another Key
+              <RefreshCw size={13} />
+              Provision Another Key
             </button>
           </motion.div>
         ) : (
@@ -157,22 +152,22 @@ export function GenerateKeyForm() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="card-surface p-6 space-y-5"
+            className="bg-white border border-border rounded-2xl p-6 md:p-8 space-y-6 shadow-sm"
           >
             {/* Plan */}
             <div>
-              <label className="text-text-secondary text-sm font-medium mb-3 block">
-                Plan
+              <label className="text-muted text-[10px] font-black uppercase tracking-wider mb-2.5 block">
+                Plan Level
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-3 gap-3">
                 {["basic", "pro", "elite"].map((p) => (
                   <button
                     key={p}
                     onClick={() => setPlan(p)}
-                    className={`py-3 rounded-xl border text-sm font-medium capitalize transition-all ${
+                    className={`py-3.5 rounded-xl border text-xs font-black uppercase tracking-widest transition-all ${
                       plan === p
-                        ? "border-accent-primary bg-accent-primary/15 text-accent-primary"
-                        : "border-border text-text-secondary hover:border-border-glow"
+                        ? "border-accent bg-accent/5 text-accent"
+                        : "border-border text-muted hover:border-foreground"
                     }`}
                   >
                     {p}
@@ -183,21 +178,21 @@ export function GenerateKeyForm() {
 
             {/* Duration */}
             <div>
-              <label className="text-text-secondary text-sm font-medium mb-3 block">
-                Duration
+              <label className="text-muted text-[10px] font-black uppercase tracking-wider mb-2.5 block">
+                Billing Cycle Duration
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 {[
-                  { value: "lifetime", label: "Lifetime" },
-                  { value: "subscription", label: "Monthly" },
+                  { value: "lifetime", label: "Lifetime Asset" },
+                  { value: "subscription", label: "Monthly subscription" },
                 ].map((d) => (
                   <button
                     key={d.value}
                     onClick={() => setDuration(d.value)}
-                    className={`py-3 rounded-xl border text-sm font-medium transition-all ${
+                    className={`py-3.5 rounded-xl border text-xs font-black uppercase tracking-widest transition-all ${
                       duration === d.value
-                        ? "border-accent-primary bg-accent-primary/15 text-accent-primary"
-                        : "border-border text-text-secondary hover:border-border-glow"
+                        ? "border-accent bg-accent/5 text-accent"
+                        : "border-border text-muted hover:border-foreground"
                     }`}
                   >
                     {d.label}
@@ -208,21 +203,21 @@ export function GenerateKeyForm() {
 
             {/* Devices */}
             <div>
-              <label className="text-text-secondary text-sm font-medium mb-3 block">
-                Devices
+              <label className="text-muted text-[10px] font-black uppercase tracking-wider mb-2.5 block">
+                Bound Machine Allocations
               </label>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-3">
                 {[
-                  { value: "1", label: "1 Device" },
-                  { value: "unlimited", label: "Unlimited" },
+                  { value: "1", label: "Single Device" },
+                  { value: "unlimited", label: "Unlimited Devices" },
                 ].map((d) => (
                   <button
                     key={d.value}
                     onClick={() => setDevices(d.value)}
-                    className={`py-3 rounded-xl border text-sm font-medium transition-all ${
+                    className={`py-3.5 rounded-xl border text-xs font-black uppercase tracking-widest transition-all ${
                       devices === d.value
-                        ? "border-accent-primary bg-accent-primary/15 text-accent-primary"
-                        : "border-border text-text-secondary hover:border-border-glow"
+                        ? "border-accent bg-accent/5 text-accent"
+                        : "border-border text-muted hover:border-foreground"
                     }`}
                   >
                     {d.label}
@@ -233,54 +228,52 @@ export function GenerateKeyForm() {
 
             {/* Email */}
             <div>
-              <label className="text-text-secondary text-sm font-medium mb-2 block">
-                Customer Email{" "}
-                <span className="text-text-muted font-normal">(optional)</span>
+              <label className="text-muted text-[10px] font-black uppercase tracking-wider mb-2 block">
+                Customer Email <span className="font-medium lowercase text-muted/60">(optional)</span>
               </label>
               <input
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="customer@example.com"
-                className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors"
+                className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-foreground text-sm font-semibold focus:outline-none focus:border-accent transition-colors"
               />
             </div>
 
             {/* Notes */}
             <div>
-              <label className="text-text-secondary text-sm font-medium mb-2 block">
-                Internal Notes{" "}
-                <span className="text-text-muted font-normal">(optional)</span>
+              <label className="text-muted text-[10px] font-black uppercase tracking-wider mb-2 block">
+                Internal Tracking Notes <span className="font-medium lowercase text-muted/60">(optional)</span>
               </label>
               <textarea
                 value={notes}
                 onChange={(e) => setNotes(e.target.value)}
-                placeholder="e.g. Manual issue, giveaway, replacement..."
-                rows={2}
-                className="w-full bg-bg-elevated border border-border rounded-xl px-4 py-3 text-text-primary text-sm placeholder:text-text-muted focus:outline-none focus:border-accent-primary transition-colors resize-none"
+                placeholder="Replacement license, custom promotional tier, offline distribution..."
+                rows={3}
+                className="w-full bg-background border border-border rounded-xl px-4 py-3.5 text-foreground text-sm font-semibold focus:outline-none focus:border-accent transition-colors resize-none"
               />
             </div>
 
-            {/* Error */}
+            {/* Error banner */}
             {error && (
-              <div className="flex items-center gap-2 bg-accent-hot/10 border border-accent-hot/30 rounded-xl p-3">
-                <AlertCircle size={14} className="text-accent-hot" />
-                <p className="text-accent-hot text-sm">{error}</p>
+              <div className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-xl p-4">
+                <AlertCircle size={14} className="text-red-600 shrink-0" />
+                <p className="text-red-600 text-xs font-bold leading-none">{error}</p>
               </div>
             )}
 
-            {/* Generate button */}
+            {/* Generate Trigger */}
             <button
               onClick={handleGenerate}
               disabled={loading}
-              className="w-full flex items-center justify-center gap-2 py-4 bg-gradient-accent text-white rounded-xl font-semibold text-sm tracking-wide uppercase hover:shadow-[0_8px_30px_rgba(102,126,234,0.4)] transition-all disabled:opacity-50"
+              className="w-full flex items-center justify-center gap-2 py-4 bg-accent text-white rounded-full text-xs font-black uppercase tracking-widest hover:bg-[#4F52D6] transition-colors disabled:opacity-50"
             >
               {loading ? (
-                <Loader2 size={16} className="animate-spin" />
+                <Loader2 size={13} className="animate-spin" />
               ) : (
-                <Key size={16} />
+                <Key size={13} />
               )}
-              {loading ? "Generating..." : "Generate License Key"}
+              {loading ? "Generating Core Signatures..." : "Generate License Token"}
             </button>
           </motion.div>
         )}

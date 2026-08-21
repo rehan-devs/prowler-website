@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { Loader2, AlertCircle, Zap } from "lucide-react";
 
@@ -35,222 +35,136 @@ export function AdminLoginForm() {
       router.push("/admin");
       router.refresh();
     } catch {
-      setError("Connection error. Please try again.");
+      setError("Connection failed. Please retry.");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="flex flex-col items-center gap-8">
-      {/* Logo */}
+    <div className="flex flex-col items-center gap-8 justify-center min-h-[70vh]">
+      
+      {/* Platform Branding */}
       <motion.div
         initial={{ opacity: 0, y: -20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="flex items-center gap-2"
+        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+        className="flex items-center gap-3"
       >
-        <div className="w-10 h-10 rounded-xl bg-gradient-accent flex items-center justify-center">
+        <div className="w-10 h-10 rounded-2xl bg-accent flex items-center justify-center">
           <Zap size={18} className="text-white" />
         </div>
-        <span className="font-display font-bold text-text-primary text-xl">
-          Prowler<span className="text-accent-primary">.io</span>
-        </span>
-        <span className="text-text-muted text-sm ml-1">Admin</span>
+        <div>
+          <span className="font-display font-black text-foreground text-xl tracking-tight">
+            Prowler<span className="text-accent">.io</span>
+          </span>
+          <span className="text-muted text-[10px] font-black uppercase tracking-widest block">
+            Infrastructure Console
+          </span>
+        </div>
       </motion.div>
 
-      {/* Brutalist login card */}
+      {/* Snappy Spring brutalist Card */}
       <motion.div
         initial={{ opacity: 0, scale: 0.95 }}
         animate={{ opacity: 1, scale: 1 }}
-        transition={{ delay: 0.1 }}
+        transition={{ delay: 0.1, type: "spring", stiffness: 150, damping: 15 }}
         className="relative"
-        style={{ perspective: "1000px" }}
       >
-        <style jsx>{`
-          .login-card {
-            position: relative;
-            width: 320px;
-            height: 80px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border: 3px solid #1e1e2e;
-            box-shadow: 6px 6px 0 #1e1e2e, 12px 12px 0 rgba(102, 126, 234, 0.2);
-            cursor: pointer;
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
-            transform-style: preserve-3d;
-            border-radius: 16px;
-          }
-          .login-card.expanded {
-            height: 280px;
-            transform: translateZ(10px) rotateX(2deg);
-            box-shadow: 8px 8px 0 #1e1e2e, 18px 18px 0 rgba(102, 126, 234, 0.3),
-              0 0 60px rgba(102, 126, 234, 0.4);
-          }
-          .login-title {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 80px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.4s ease;
-          }
-          .login-title-text {
-            color: white;
-            font-weight: 800;
-            font-size: 14px;
-            text-transform: uppercase;
-            letter-spacing: 3px;
-            transition: all 0.4s ease;
-          }
-          .login-card.expanded .login-title-text {
-            opacity: 0;
-            transform: translateY(-30px) scale(0.8);
-          }
-          .login-form-inner {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            padding: 24px;
-            box-sizing: border-box;
-            opacity: 0;
-            transform: translateY(30px) scale(0.8);
-            transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          }
-          .login-card.expanded .login-form-inner {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-          .login-card::before {
-            content: "";
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-              90deg,
-              transparent,
-              rgba(255, 255, 255, 0.15),
-              transparent
-            );
-            transition: left 0.7s ease;
-          }
-          .login-card.expanded::before {
-            left: 100%;
-          }
-        `}</style>
-
         <div
-          className={`login-card ${isExpanded ? "expanded" : ""}`}
+          className={`bg-white border-2 border-foreground rounded-2xl p-8 shadow-[6px_6px_0px_#0A0A0A] transition-all duration-300 w-[340px] ${
+            isExpanded ? "h-[320px]" : "h-[160px] flex items-center justify-center cursor-pointer"
+          }`}
           onClick={() => !isExpanded && setIsExpanded(true)}
         >
-          {/* Collapsed state */}
-          <div className="login-title">
-            <span className="login-title-text">Enter Admin Zone</span>
-          </div>
-
-          {/* Expanded form */}
-          <form
-            className="login-form-inner"
-            onSubmit={handleSubmit}
-          >
-            <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="admin@prowler.io"
-              required
-              autoComplete="email"
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                marginBottom: "10px",
-                background: "rgba(255,255,255,0.15)",
-                border: "2px solid rgba(255,255,255,0.3)",
-                borderRadius: "8px",
-                color: "white",
-                fontSize: "13px",
-                outline: "none",
-                boxSizing: "border-box",
-              }}
-            />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password"
-              required
-              autoComplete="current-password"
-              style={{
-                width: "100%",
-                padding: "10px 12px",
-                marginBottom: "14px",
-                background: "rgba(255,255,255,0.15)",
-                border: "2px solid rgba(255,255,255,0.3)",
-                borderRadius: "8px",
-                color: "white",
-                fontSize: "13px",
-                outline: "none",
-                boxSizing: "border-box",
-              }}
-            />
-            <button
-              type="submit"
-              disabled={loading}
-              style={{
-                width: "100%",
-                padding: "11px",
-                background: "rgba(0,0,0,0.4)",
-                color: "white",
-                border: "2px solid rgba(255,255,255,0.3)",
-                borderRadius: "8px",
-                fontWeight: 800,
-                fontSize: "12px",
-                textTransform: "uppercase",
-                letterSpacing: "2px",
-                cursor: loading ? "not-allowed" : "pointer",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "6px",
-              }}
-            >
-              {loading ? (
-                <>
-                  <Loader2 size={12} className="animate-spin" />
-                  Verifying...
-                </>
-              ) : (
-                "Enter Zone"
-              )}
-            </button>
-          </form>
+          <AnimatePresence mode="wait">
+            {!isExpanded ? (
+              <motion.div
+                key="collapsed"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="text-center"
+              >
+                <span className="text-xs font-black uppercase tracking-[0.2em] text-foreground">
+                  Access Secure Vault &rarr;
+                </span>
+              </motion.div>
+            ) : (
+              <motion.form
+                key="expanded"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: 10 }}
+                transition={{ duration: 0.3 }}
+                onSubmit={handleSubmit}
+                className="space-y-4 w-full"
+              >
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-wider text-muted mb-1 block">
+                    Infrastructure Mail
+                  </label>
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder="admin@prowler.io"
+                    required
+                    autoComplete="email"
+                    className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground text-xs font-semibold focus:outline-none focus:border-accent transition-colors"
+                  />
+                </div>
+                <div>
+                  <label className="text-[9px] font-black uppercase tracking-wider text-muted mb-1 block">
+                    Validation Secret
+                  </label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••"
+                    required
+                    autoComplete="current-password"
+                    className="w-full bg-background border border-border rounded-xl px-4 py-3 text-foreground text-xs font-semibold focus:outline-none focus:border-accent transition-colors"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 bg-accent text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-[#4F52D6] transition-colors flex items-center justify-center gap-2"
+                >
+                  {loading ? (
+                    <>
+                      <Loader2 size={12} className="animate-spin" />
+                      Authenticating...
+                    </>
+                  ) : (
+                    "Authorize Session"
+                  )}
+                </button>
+              </motion.form>
+            )}
+          </AnimatePresence>
         </div>
       </motion.div>
 
-      {/* Error */}
-      {error && (
-        <motion.div
-          initial={{ opacity: 0, y: -5 }}
-          animate={{ opacity: 1, y: 0 }}
-          className="flex items-center gap-2 bg-accent-hot/10 border border-accent-hot/30 rounded-xl px-4 py-3 max-w-xs w-full"
-        >
-          <AlertCircle size={14} className="text-accent-hot flex-shrink-0" />
-          <p className="text-accent-hot text-sm">{error}</p>
-        </motion.div>
-      )}
+      {/* Error Banner */}
+      <AnimatePresence>
+        {error && (
+          <motion.div
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center gap-2.5 bg-red-50 border border-red-200 rounded-2xl px-5 py-3.5 max-w-xs w-full"
+          >
+            <AlertCircle size={14} className="text-red-600 shrink-0" />
+            <p className="text-red-600 text-xs font-bold leading-none">{error}</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      <p className="text-text-muted text-xs">
-        Prowler.io Admin Panel — Authorized Access Only
+      <p className="text-muted text-[10px] font-bold uppercase tracking-widest text-center max-w-xs leading-relaxed">
+        Access strictly cataloged under dynamic hardware routing profiles.
       </p>
     </div>
   );
