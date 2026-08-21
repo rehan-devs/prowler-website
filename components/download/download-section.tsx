@@ -1,9 +1,10 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Monitor, Apple, Terminal, Download, AlertCircle, Check } from "lucide-react";
+import { motion } from "framer-motion";
+import { Monitor, Apple, Terminal, AlertCircle } from "lucide-react";
 import { InlineAnnotation } from "@/components/ui/visual-anchors";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
 type OS = "windows" | "mac" | "linux";
 
@@ -73,37 +74,37 @@ export function DownloadSection() {
         
         {/* Header */}
         <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  className="text-center mb-16 relative"
->
-  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-4">
-    Stable Desktop Releases
-  </span>
-  <h1 className="text-display-sm md:text-display-md text-foreground mb-4 leading-none tracking-tight">
-    Prowler{" "}
-    <span className="relative inline-block">
-      for
-      <span className="hidden md:block absolute top-0 right-0 w-0 h-0">
-        <InlineAnnotation
-          text="version 1.0.0 is live"
-          delay={0.6}
-          path="M 0,0 Q 45,-40 100,-18"
-          svgStyles={{ top: "5%", left: "80%" }}
-          textStyles={{
-            top: "-12px",
-            left: "110px",
-            transform: "rotate(5deg)",
-          }}
-        />
-      </span>
-    </span>{" "}
-    <span className="accent-block">desktop.</span>
-  </h1>
-  <p className="text-muted text-base font-medium max-w-xl mx-auto">
-    Zero cloud telemetry. Local sandbox execution. Complete domain ownership of your data files.
-  </p>
-</motion.div>
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-16 relative"
+        >
+          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-4">
+            Stable Desktop Releases
+          </span>
+          <h1 className="text-display-sm md:text-display-md text-foreground mb-4 leading-none tracking-tight">
+            Prowler{" "}
+            <span className="relative inline-block">
+              for
+              <span className="hidden md:block absolute top-0 right-0 w-0 h-0">
+                <InlineAnnotation
+                  text="version 1.0.0 is live"
+                  delay={0.6}
+                  path="M 0,0 Q 45,-40 100,-18"
+                  svgStyles={{ top: "5%", left: "80%" }}
+                  textStyles={{
+                    top: "-12px",
+                    left: "110px",
+                    transform: "rotate(5deg)",
+                  }}
+                />
+              </span>
+            </span>{" "}
+            <span className="accent-block">desktop.</span>
+          </h1>
+          <p className="text-muted text-base font-medium max-w-xl mx-auto">
+            Zero cloud telemetry. Local sandbox execution. Complete domain ownership of your data files.
+          </p>
+        </motion.div>
 
         {/* Custom Pill Toggle Selector */}
         <div className="flex justify-center mb-8">
@@ -159,15 +160,13 @@ export function DownloadSection() {
               </div>
             </div>
 
-            <a
+            <AnimatedButton
               href={`/api/download/${activeOS}`}
-              className="group flex items-center justify-center gap-4 bg-accent text-white py-4 rounded-full font-bold text-xs tracking-wider uppercase hover:bg-[#4F52D6] transition-colors w-full"
+              variant="accent"
+              className="w-full justify-center"
             >
-              Get Download Package
-              <span className="w-6 h-6 bg-foreground rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-200">
-                <Download size={11} className="text-white" />
-              </span>
-            </a>
+              Download for {current.label}
+            </AnimatedButton>
           </div>
 
           {/* Box Right */}

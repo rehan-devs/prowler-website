@@ -1,9 +1,9 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { ArrowRight, Zap } from "lucide-react";
+import { Zap } from "lucide-react";
 import { InlineAnnotation } from "@/components/ui/visual-anchors";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
 export default function NotFound() {
   return (
@@ -65,15 +65,9 @@ export default function NotFound() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.3 }}
         >
-          <Link
-            href="/"
-            className="group flex items-center gap-4 bg-accent text-white pl-8 pr-2 py-2 rounded-full font-bold text-sm tracking-wider uppercase hover:bg-[#4F52D6] transition-colors"
-          >
+          <AnimatedButton href="/" variant="accent">
             Back to Home
-            <span className="w-10 h-10 bg-foreground rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-200">
-              <ArrowRight size={16} className="text-white" />
-            </span>
-          </Link>
+          </AnimatedButton>
         </motion.div>
 
         {/* Trust row footer metadata */}

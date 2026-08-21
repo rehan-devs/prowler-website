@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 import {
   X,
@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { PLANS, PlanKey, getPrice } from "@/lib/license";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
 interface OrderModalProps {
   plan: PlanKey;
@@ -92,6 +94,20 @@ export function OrderModal({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [dragOver, setDragOver] = useState(false);
+
+  // Prevent background scrolling for both native scroll and smooth-scroll libraries like Lenis
+  useEffect(() => {
+    const originalBodyOverflow = document.body.style.overflow;
+    const originalHtmlOverflow = document.documentElement.style.overflow;
+
+    document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
+    
+    return () => {
+      document.body.style.overflow = originalBodyOverflow;
+      document.documentElement.style.overflow = originalHtmlOverflow;
+    };
+  }, []);
 
   const price = getPrice(plan, duration, devices);
   const planData = PLANS[plan];
@@ -186,6 +202,7 @@ export function OrderModal({
         exit={{ opacity: 0, scale: 0.96, y: 16 }}
         transition={{ type: "spring", stiffness: 400, damping: 30 }}
         className="w-full max-w-lg bg-background border border-border rounded-2xl overflow-hidden max-h-[90vh] overflow-y-auto shadow-2xl"
+        data-lenis-prevent /* Stops Lenis scroll hijacking inside the modal box */
       >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-border">
@@ -317,12 +334,13 @@ export function OrderModal({
                 </ol>
               </div>
 
-              <button
+              <AnimatedButton
                 onClick={() => setStep(2)}
-                className="w-full py-4 bg-accent text-white rounded-full font-bold text-sm tracking-wider uppercase hover:bg-[#4F52D6] transition-colors"
+                variant="accent"
+                className="w-full justify-center"
               >
                 I&apos;ve Paid. Continue
-              </button>
+              </AnimatedButton>
             </motion.div>
           )}
 
@@ -404,7 +422,7 @@ export function OrderModal({
                   Payment Screenshot
                 </label>
                 <div
-                  className={`relative border-2 border-dashed rounded-2xl transition-all duration-200 overflow-hidden ${
+                  className={`relative border-2 border-dashed rounded-2xl transition-all duration-200 overflow-hidden h-48 ${
                     dragOver
                       ? "border-accent bg-accent/5"
                       : screenshotPreview
@@ -419,22 +437,24 @@ export function OrderModal({
                   onDrop={handleDrop}
                 >
                   {screenshotPreview ? (
-                    <div className="relative">
-                      <img
+                    <div className="relative w-full h-full">
+                      <Image
                         src={screenshotPreview}
                         alt="Payment screenshot"
-                        className="w-full h-48 object-cover"
+                        fill
+                        className="object-cover"
+                        unoptimized
                       />
                       <button
                         onClick={() => {
                           setScreenshot(null);
                           setScreenshotPreview(null);
                         }}
-                        className="absolute top-3 right-3 w-8 h-8 bg-foreground/80 rounded-full flex items-center justify-center text-white hover:bg-foreground transition-colors"
+                        className="absolute top-3 right-3 w-8 h-8 bg-foreground/80 rounded-full flex items-center justify-center text-white hover:bg-foreground transition-colors z-10"
                       >
                         <X size={12} />
                       </button>
-                      <div className="absolute bottom-3 left-3 bg-accent text-white rounded-full px-3 py-1 flex items-center gap-1.5">
+                      <div className="absolute bottom-3 left-3 bg-accent text-white rounded-full px-3 py-1 flex items-center gap-1.5 z-10">
                         <Check size={11} strokeWidth={3} />
                         <span className="text-xs font-bold">Uploaded</span>
                       </div>
@@ -442,7 +462,7 @@ export function OrderModal({
                   ) : (
                     <button
                       onClick={() => fileInputRef.current?.click()}
-                      className="w-full p-8 flex flex-col items-center gap-3"
+                      className="w-full h-full p-8 flex flex-col items-center justify-center gap-3"
                     >
                       <div className="w-12 h-12 rounded-full bg-background border border-border flex items-center justify-center">
                         <Upload size={18} className="text-muted" />
@@ -503,16 +523,18 @@ export function OrderModal({
 
               {/* Buttons */}
               <div className="flex gap-3 pt-1">
-                <button
+                <AnimatedButton
                   onClick={() => setStep(1)}
-                  className="flex-1 py-3.5 border border-border rounded-full text-muted text-sm font-bold hover:border-foreground hover:text-foreground transition-all"
+                  variant="white"
+                  className="flex-1 justify-center py-3.5"
                 >
                   Back
-                </button>
-                <button
+                </AnimatedButton>
+                <AnimatedButton
                   onClick={handleSubmit}
                   disabled={loading}
-                  className="flex-[2] py-3.5 bg-accent text-white rounded-full font-bold text-sm tracking-wider uppercase hover:bg-[#4F52D6] transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  variant="accent"
+                  className="flex-[2] justify-center py-3.5 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {loading ? (
                     <>
@@ -522,7 +544,7 @@ export function OrderModal({
                   ) : (
                     "Submit Order"
                   )}
-                </button>
+                </AnimatedButton>
               </div>
 
               <p className="text-muted text-xs text-center font-medium">

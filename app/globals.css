@@ -73,3 +73,142 @@ html.lenis, html.lenis body {
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }
+
+/* Animated Button System */
+.animated-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px 42px;
+  font-size: 14px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  border-radius: 100px;
+  cursor: pointer;
+  overflow: hidden;
+  border: 2px solid transparent;
+  transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+  user-select: none;
+  text-decoration: none;
+}
+
+.animated-btn svg.arr-icon {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  z-index: 9;
+  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+.animated-btn .arr-1 {
+  right: 20px;
+}
+
+.animated-btn .arr-2 {
+  left: -40px; /* Fixed pixel distance so wide buttons don't lag */
+}
+
+.animated-btn .btn-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  opacity: 0;
+  z-index: 2;
+  transition: width 0.8s cubic-bezier(0.23, 1, 0.32, 1),
+              height 0.8s cubic-bezier(0.23, 1, 0.32, 1),
+              opacity 0.6s ease;
+}
+
+.animated-btn .btn-text {
+  position: relative;
+  z-index: 5;
+  transform: translateX(-10px);
+  transition: all 0.8s cubic-bezier(0.23, 1, 0.32, 1);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* Hover States */
+.animated-btn:hover {
+  border-radius: 14px;
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
+}
+
+.animated-btn:hover .arr-1 {
+  right: -40px;
+}
+
+.animated-btn:hover .arr-2 {
+  left: 20px;
+}
+
+.animated-btn:hover .btn-text {
+  transform: translateX(10px);
+}
+
+/* ⚡️ Increased to 1000px so it fully covers 100% of wide and full-width buttons */
+.animated-btn:hover .btn-circle {
+  width: 1000px;
+  height: 1000px;
+  opacity: 1;
+}
+
+.animated-btn:active {
+  transform: scale(0.97);
+}
+
+/* Variants */
+.animated-btn-accent {
+  background-color: #6366F1;
+  color: #FFFFFF;
+}
+.animated-btn-accent svg.arr-icon {
+  fill: #FFFFFF;
+}
+.animated-btn-accent .btn-circle {
+  background-color: #4F52D6;
+}
+.animated-btn-accent:hover {
+  color: #FFFFFF;
+}
+
+.animated-btn-dark {
+  background-color: #0A0A0A;
+  color: #FAFAFA;
+}
+.animated-btn-dark svg.arr-icon {
+  fill: #FAFAFA;
+}
+.animated-btn-dark .btn-circle {
+  background-color: #6366F1;
+}
+.animated-btn-dark:hover {
+  color: #FFFFFF;
+}
+
+.animated-btn-white {
+  background-color: #FFFFFF;
+  color: #0A0A0A;
+  border-color: #E5E5E0;
+}
+.animated-btn-white svg.arr-icon {
+  fill: #0A0A0A;
+}
+.animated-btn-white .btn-circle {
+  background-color: #0A0A0A;
+}
+.animated-btn-white:hover {
+  color: #FFFFFF;
+  border-color: #0A0A0A;
+}
+.animated-btn-white:hover svg.arr-icon {
+  fill: #FFFFFF;
+}

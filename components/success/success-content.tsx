@@ -2,9 +2,9 @@
 
 import { useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
-import { Mail, Download, Clock, Check, ArrowRight, ShieldCheck } from "lucide-react";
-import Link from "next/link";
+import { Mail, Clock, Check, ShieldCheck } from "lucide-react";
 import { InlineAnnotation } from "@/components/ui/visual-anchors";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
 function PaymentCard() {
   return (
@@ -169,21 +169,12 @@ export function SuccessContent() {
           transition={{ delay: 0.4 }}
           className="flex flex-col sm:flex-row gap-4 w-full"
         >
-          <Link
-            href="/download"
-            className="group flex-1 flex items-center justify-center gap-3 bg-accent text-white py-3.5 rounded-full font-bold text-xs tracking-wider uppercase hover:bg-[#4F52D6] transition-colors"
-          >
+          <AnimatedButton href="/download" variant="accent" className="flex-1 justify-center">
             Download Center
-            <span className="w-6 h-6 bg-foreground rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-200">
-              <Download size={11} className="text-white" />
-            </span>
-          </Link>
-          <Link
-            href="/docs"
-            className="flex-1 py-4 border border-border rounded-full text-foreground text-center font-bold text-xs tracking-wider uppercase bg-white hover:border-accent hover:text-accent transition-all"
-          >
+          </AnimatedButton>
+          <AnimatedButton href="/docs" variant="white" className="flex-1 justify-center">
             Read Desktop Guides
-          </Link>
+          </AnimatedButton>
         </motion.div>
 
         <p className="text-muted text-[10px] font-bold text-center uppercase tracking-widest mt-10">

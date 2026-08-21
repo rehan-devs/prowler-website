@@ -5,6 +5,7 @@ import { motion, AnimatePresence, useInView } from "framer-motion";
 import { Check } from "lucide-react";
 import { PLANS, PRICES, PlanKey } from "@/lib/license";
 import { OrderModal } from "./order-modal";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
 type Duration = "lifetime" | "subscription";
 type Devices = "1" | "unlimited";
@@ -105,12 +106,6 @@ function PlanCard({
       ? "bg-white/5 border-white/10"
       : "bg-background border-border";
 
-  const ctaClass = isPro
-    ? "bg-white text-foreground hover:bg-white/90"
-    : isElite
-      ? "bg-accent text-white hover:bg-[#4F52D6]"
-      : "bg-foreground text-white hover:bg-foreground/90";
-
   return (
     <motion.div
       ref={ref}
@@ -194,12 +189,13 @@ function PlanCard({
       </ul>
 
       {/* CTA */}
-      <button
+      <AnimatedButton
         onClick={() => onSelect(plan)}
-        className={`w-full py-4 rounded-full font-bold text-sm tracking-wider uppercase transition-all duration-200 hover:scale-[1.02] ${ctaClass}`}
+        variant={isPro ? "white" : isElite ? "accent" : "dark"}
+        className="w-full justify-center"
       >
         Get {planData.name}
-      </button>
+      </AnimatedButton>
     </motion.div>
   );
 }
@@ -221,7 +217,7 @@ export function PricingSection() {
             initial={{ opacity: 0, y: 20 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
             transition={{ duration: 0.5 }}
-            className="font-display font-black text-display-sm md:text-display-md text-foreground mb-5 tracking-tight"
+            className="font-display font-black text-display-sm md:text-display-md text-foreground mb-10 tracking-tight"
           >
             One tool.{" "}
             <span className="accent-block">Real leads.</span>

@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Mail, BookOpen, Clock, Check, Loader2, AlertCircle, Plus } from "lucide-react";
 import Link from "next/link";
 import { InlineAnnotation } from "@/components/ui/visual-anchors";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
 const commonIssues = [
   {
@@ -62,34 +63,34 @@ export function SupportPage() {
         
         {/* Header */}
         <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
-  className="text-center mb-20 relative"
->
-  <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-4">
-    Direct Support Line
-  </span>
-  <h1 className="text-display-sm md:text-display-md text-foreground max-w-3xl mx-auto leading-none tracking-tight">
-    How can{" "}
-    <span className="relative inline-block">
-      we
-      <span className="hidden md:block absolute top-0 right-0 w-0 h-0">
-        <InlineAnnotation
-          text="real humans here"
-          delay={0.6}
-          path="M 0,0 Q 45,-40 105,-18"
-          svgStyles={{ top: "5%", left: "80%" }}
-          textStyles={{
-            top: "-12px",
-            left: "115px",
-            transform: "rotate(5deg)",
-          }}
-        />
-      </span>
-    </span>{" "}
-    <span className="accent-block">help?</span>
-  </h1>
-</motion.div>
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-center mb-20 relative"
+        >
+          <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-muted block mb-4">
+            Direct Support Line
+          </span>
+          <h1 className="text-display-sm md:text-display-md text-foreground max-w-3xl mx-auto leading-none tracking-tight">
+            How can{" "}
+            <span className="relative inline-block">
+              we
+              <span className="hidden md:block absolute top-0 right-0 w-0 h-0">
+                <InlineAnnotation
+                  text="real humans here"
+                  delay={0.6}
+                  path="M 0,0 Q 45,-40 105,-18"
+                  svgStyles={{ top: "5%", left: "80%" }}
+                  textStyles={{
+                    top: "-12px",
+                    left: "115px",
+                    transform: "rotate(5deg)",
+                  }}
+                />
+              </span>
+            </span>{" "}
+            <span className="accent-block">help?</span>
+          </h1>
+        </motion.div>
 
         {/* Grid Boxes */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
@@ -277,17 +278,21 @@ export function SupportPage() {
                     </div>
                   )}
 
-                  <button
+                  <AnimatedButton
                     type="submit"
                     disabled={loading}
-                    className="w-full py-4 rounded-full bg-accent text-white font-bold text-sm tracking-wider uppercase hover:bg-[#4F52D6] transition-colors flex items-center justify-center gap-2"
+                    variant="accent"
+                    className="w-full justify-center"
                   >
                     {loading ? (
-                      <Loader2 size={16} className="animate-spin" />
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        Sending Ticket...
+                      </>
                     ) : (
                       "Submit Support Ticket"
                     )}
-                  </button>
+                  </AnimatedButton>
                 </form>
               )}
             </div>

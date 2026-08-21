@@ -1,15 +1,12 @@
 "use client";
 
 import { motion } from "framer-motion";
-import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { AnimatedButton } from "@/components/ui/animated-button";
 
 export function CtaSection() {
   return (
     <section className="py-32 bg-inverted">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center flex flex-col items-center">
-        {/* Start Today eyebrow removed */}
-
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -25,16 +22,11 @@ export function CtaSection() {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
           transition={{ delay: 0.15 }}
+          className="mb-12"
         >
-          <Link
-            href="/pricing"
-            className="group inline-flex items-center gap-4 bg-accent text-white pl-8 pr-2 py-2 rounded-full font-bold text-sm tracking-wider uppercase hover:bg-[#4F52D6] transition-colors mb-12"
-          >
+          <AnimatedButton href="/pricing" variant="accent">
             View Pricing
-            <div className="w-10 h-10 bg-inverted rounded-full flex items-center justify-center group-hover:translate-x-1 transition-transform duration-200">
-              <ArrowRight size={16} className="text-white" />
-            </div>
-          </Link>
+          </AnimatedButton>
         </motion.div>
 
         <motion.div

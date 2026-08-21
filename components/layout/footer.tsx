@@ -32,13 +32,10 @@ export function Footer() {
           
           {/* Brand Col */}
           <div className="lg:col-span-2">
-            <Link href="/" className="flex items-center gap-1.5 group mb-6 inline-flex">
+            <Link href="/" className="flex items-center group mb-6 inline-flex">
               <span className="font-display font-black text-3xl tracking-tight">
                 PROWLER
               </span>
-              <div className="bg-accent text-white text-[12px] font-bold px-2 py-0.5 rounded uppercase tracking-wider">
-                .io
-              </div>
             </Link>
             <p className="text-inverted-muted text-lg max-w-sm font-medium leading-relaxed">
               Professional lead scraping software. Find thousands of verified business contacts in minutes, straight from your desktop.
@@ -76,7 +73,7 @@ export function Footer() {
         {/* Bottom Bar */}
         <div className="border-t border-border-inverted pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
           <p className="text-inverted-muted text-sm font-medium">
-            &copy; {new Date().getFullYear()} Prowler.io. All rights reserved.
+            &copy; {new Date().getFullYear()} Prowler. All rights reserved.
           </p>
           <p className="text-inverted-muted text-sm font-medium">
             Built for serious lead generators.
@@ -84,7 +81,7 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Massive Brand Watermark - Reduced Height */}
+      {/* Massive Brand Watermark */}
       <div className="w-full overflow-hidden flex justify-center mt-12 pointer-events-none select-none h-[12vw] md:h-[10vw]">
         <span className="text-[18vw] md:text-[14vw] leading-[0.75] font-display font-black text-white/5 tracking-tighter mix-blend-overlay">
           PROWLER
