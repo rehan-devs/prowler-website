@@ -104,7 +104,7 @@ export function SupportPage() {
             },
             {
               icon: Mail,
-              title: "Raw Email",
+              title: "Email",
               desc: "rehandevs1@gmail.com",
               href: "mailto:rehandevs1@gmail.com",
               badge: "Mail directly",
