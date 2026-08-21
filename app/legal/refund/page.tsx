@@ -35,7 +35,7 @@ const refundContent = [
   {
     title: "How to Request a Refund",
     content:
-      "Email support@prowler.io with your order details (the email you used to purchase), your reason for requesting a refund, and screenshots of any errors you encountered. We will respond within 2 business days.",
+      "Email rehandevs1@gmail.com with your order details (the email you used to purchase), your reason for requesting a refund, and screenshots of any errors you encountered. We will respond within 2 business days.",
   },
   {
     title: "Refund Processing",
