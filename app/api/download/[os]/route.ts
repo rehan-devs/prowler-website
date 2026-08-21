@@ -8,22 +8,22 @@ const INSTALLERS: Record<string, string> = {
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { os: string } }
+  { params }: { params: Promise<{ os: string }> }
 ) {
-  const os = params.os.toLowerCase();
-  const url = INSTALLERS[os];
+  // Await the asynchronous params object in Next.js 15/16
+  const { os } = await params;
+  const targetOs = os.toLowerCase();
+  const url = INSTALLERS[targetOs];
 
   if (!url) {
     return NextResponse.json({ error: "Invalid OS" }, { status: 400 });
   }
 
-  // When you have real installer URLs, this will redirect
-  // For now return a helpful message
   return NextResponse.json(
     {
       message:
         "Installers will be available once uploaded. Check your email after purchase for the download link.",
-      os,
+      os: targetOs,
     },
     { status: 200 }
   );

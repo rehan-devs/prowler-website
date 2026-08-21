@@ -75,8 +75,8 @@ export async function GET(req: NextRequest) {
 
     const csv = [headers.join(","), ...rows].join("\n");
 
-    // Log the export action
-    await logAdminAction(admin.email, "exported_licenses", "license", null, {
+    // Log the export action (FIXED: Passed undefined instead of null to resolve type constraint)
+    await logAdminAction(admin.email, "exported_licenses", "license", undefined, {
       count: licenses?.length || 0,
       filters: { status, plan },
     });
