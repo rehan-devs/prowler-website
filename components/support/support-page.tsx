@@ -17,7 +17,7 @@ const commonIssues = [
   },
   {
     q: "I lost my license key email",
-    a: "Please submit your purchase email address via the support form below or email support@prowler.io directly. We will recover and send your keys within the hour.",
+    a: "Please submit your purchase email address via the support form below or email rehandevs1@gmail.com directly. We will recover and send your keys within the hour.",
   },
   {
     q: "The scraper is finding 0 results",
@@ -50,7 +50,7 @@ export function SupportPage() {
       if (!res.ok) throw new Error("Failed to send");
       setSent(true);
     } catch {
-      setError("Failed to send message. Please email us directly at support@prowler.io");
+      setError("Failed to send message. Please email us directly at rehandevs1@gmail.com");
     } finally {
       setLoading(false);
     }
@@ -104,8 +104,8 @@ export function SupportPage() {
             {
               icon: Mail,
               title: "Raw Email",
-              desc: "support@prowler.io",
-              href: "mailto:support@prowler.io",
+              desc: "rehandevs1@gmail.com",
+              href: "mailto:rehandevs1@gmail.com",
               badge: "Mail directly",
             },
             {
