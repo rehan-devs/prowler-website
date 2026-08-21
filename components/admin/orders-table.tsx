@@ -50,7 +50,7 @@ const statusConfig = {
     bg: "bg-emerald-500/10 border-emerald-500/30",
   },
   rejected: {
-    icon: "text-red-700",
+    icon: XCircle,
     color: "text-red-700",
     bg: "bg-red-500/10 border-red-500/30",
   },
@@ -230,10 +230,7 @@ export function OrdersTable({
                   const sc =
                     statusConfig[order.status as keyof typeof statusConfig] ||
                     statusConfig.pending;
-                  const StatusIcon =
-                    order.status === "rejected"
-                      ? XCircle
-                      : sc.icon || Clock;
+                  const StatusIcon = sc.icon;
 
                   return (
                     <motion.tr

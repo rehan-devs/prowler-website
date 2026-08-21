@@ -4,6 +4,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import {
   ArrowLeft,
   CheckCircle,
@@ -11,7 +12,6 @@ import {
   Copy,
   Check,
   Loader2,
-  ExternalLink,
   RefreshCw,
   AlertCircle,
 } from "lucide-react";
@@ -123,6 +123,24 @@ export function OrderReview({
       minute: "2-digit",
     });
 
+  const orderDetails = [
+    { label: "Target Client Name", value: order.customer_name },
+    { label: "Target Account Email", value: order.customer_email, copy: true },
+    {
+      label: "Asset signature tier",
+      value: `${order.plan} · ${order.plan_duration} · ${
+        order.devices === "1" ? "1 Device" : "Unlimited Devices"
+      }`,
+    },
+    { label: "Volume Total", value: `$${order.amount_usd} USD` },
+    { label: "Routing pipeline", value: order.payment_method },
+    {
+      label: "Operation Type",
+      value: order.is_renewal ? "Renew Existing Key" : "New Contract Purchase",
+    },
+    { label: "Submitted date", value: formatDate(order.created_at) },
+  ];
+
   return (
     <div className="space-y-6 max-w-5xl">
       
@@ -178,7 +196,8 @@ export function OrderReview({
               </p>
             </div>
             <p className="text-muted text-xs font-semibold leading-relaxed">
-              Copy this token and transmit to client at: <strong className="text-foreground">{order.customer_email}</strong>.
+              Copy this token and transmit to client at:{" "}
+              <strong className="text-foreground">{order.customer_email}</strong>.
             </p>
             <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-white border border-emerald-200 rounded-xl p-4">
               <code className="font-mono text-emerald-700 text-base font-black tracking-widest flex-1 break-all select-all">
@@ -212,19 +231,18 @@ export function OrderReview({
               Receipt Parameters
             </h2>
             <div className="space-y-4">
-              {[
-                { label: "Target Client Name", value: order.customer_name },
-                { label: "Target Account Email", value: order.customer_email, copy: true },
-                { label: "Asset signature tier", value: `${order.plan} &middot; ${order.plan_duration} &middot; ${order.devices === "1" ? "1 Device" : "Unlimited Devices"}` },
-                { label: "Volume Total", value: `$${order.amount_usd} USD` },
-                { label: "Routing pipeline", value: order.payment_method },
-                { label: "Operation Type", value: order.is_renewal ? "Renew Existing Key" : "New Contract Purchase" },
-                { label: "Submitted date", value: formatDate(order.created_at) },
-              ].map(({ label, value, copy }) => (
-                <div key={label} className="flex justify-between items-baseline border-b border-border/40 pb-2.5 last:border-0 last:pb-0">
-                  <span className="text-muted text-[10px] font-bold uppercase tracking-wider">{label}</span>
-                  <div className="flex items-center gap-2">
-                    <span className="text-foreground text-xs font-black tracking-tight text-right" dangerouslySetInnerHTML={{ __html: value }} />
+              {orderDetails.map(({ label, value, copy }) => (
+                <div
+                  key={label}
+                  className="flex justify-between items-baseline gap-4 border-b border-border/40 pb-2.5 last:border-0 last:pb-0"
+                >
+                  <span className="text-muted text-[10px] font-bold uppercase tracking-wider shrink-0">
+                    {label}
+                  </span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="text-foreground text-xs font-black tracking-tight text-right truncate">
+                      {value}
+                    </span>
                     {copy && <CopyButton value={value} />}
                   </div>
                 </div>
@@ -280,7 +298,11 @@ export function OrderReview({
           {order.reviewed_at && (
             <div className="bg-white border border-border rounded-2xl p-6 shadow-sm">
               <p className="text-muted text-[10px] font-bold uppercase tracking-widest leading-normal">
-                Audited by <strong className="text-foreground font-black">{order.reviewed_by}</strong> on {formatDate(order.reviewed_at)}
+                Audited by{" "}
+                <strong className="text-foreground font-black">
+                  {order.reviewed_by}
+                </strong>{" "}
+                on {formatDate(order.reviewed_at)}
               </p>
               {order.admin_notes && (
                 <div className="mt-3 bg-background border border-border/60 rounded-xl p-4">
@@ -304,11 +326,13 @@ export function OrderReview({
             </h2>
             {screenshotUrl ? (
               <div className="space-y-4">
-                <div className="border border-border rounded-xl overflow-hidden bg-background">
-                  <img
+                <div className="border border-border rounded-xl overflow-hidden bg-background relative w-full h-[420px]">
+                  <Image
                     src={screenshotUrl}
                     alt="Proof Receipt Screenshot"
-                    className="w-full h-auto object-contain max-h-[420px]"
+                    fill
+                    className="object-contain"
+                    unoptimized
                   />
                 </div>
                 <a
@@ -318,7 +342,9 @@ export function OrderReview({
                   className="group flex items-center justify-center gap-2 py-3 border border-border hover:border-accent hover:text-accent rounded-full text-xs font-black uppercase tracking-wider transition-colors bg-white w-full"
                 >
                   Inspect asset proof fullscreen
-                  <span className="group-hover:translate-x-0.5 transition-transform duration-200">&rarr;</span>
+                  <span className="group-hover:translate-x-0.5 transition-transform duration-200">
+                    &rarr;
+                  </span>
                 </a>
               </div>
             ) : (
@@ -347,7 +373,9 @@ export function OrderReview({
                 ) : (
                   <CheckCircle size={12} strokeWidth={3} />
                 )}
-                {approving ? "Registering and dispatching..." : "Approve & Dispatch Key Token"}
+                {approving
+                  ? "Registering and dispatching..."
+                  : "Approve & Dispatch Key Token"}
               </button>
 
               {!showRejectForm ? (
