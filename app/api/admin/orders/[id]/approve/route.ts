@@ -1,12 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase";
-import { validateAdminSession } from "@/lib/admin-auth";
+import { validateAdminSession, logAdminAction } from "@/lib/admin-auth";
 import { generateLicenseKey, hashLicenseKey } from "@/lib/license";
-import { logAdminAction } from "@/lib/admin-auth";
 
 export async function POST(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   // Validate admin session
   const token = req.cookies.get("prowler_admin_token")?.value;
@@ -18,6 +17,9 @@ export async function POST(
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
+  // Await the asynchronous route params
+  const { id } = await params;
+
   try {
     const { adminNotes } = await req.json();
 
@@ -25,7 +27,7 @@ export async function POST(
     const { data: order, error: orderError } = await supabaseAdmin
       .from("orders")
       .select("*")
-      .eq("id", params.id)
+      .eq("id", id)
       .single();
 
     if (orderError || !order) {
@@ -106,7 +108,6 @@ export async function POST(
           .select()
           .single();
 
-        licenseKey = licenseKey;
         licenseId = newLicense!.id;
       }
     } else {
@@ -156,7 +157,7 @@ export async function POST(
         reviewed_at: new Date().toISOString(),
         reviewed_by: admin.email,
       })
-      .eq("id", params.id);
+      .eq("id", id);
 
     // Upsert customer record
     await supabaseAdmin.from("customers").upsert(
@@ -173,7 +174,7 @@ export async function POST(
       admin.email,
       "approved_order",
       "order",
-      params.id,
+      id,
       { plan: order.plan, amount: order.amount_usd }
     );
 

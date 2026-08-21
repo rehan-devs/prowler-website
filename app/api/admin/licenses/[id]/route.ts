@@ -4,7 +4,7 @@ import { validateAdminSession, logAdminAction } from "@/lib/admin-auth";
 
 export async function PATCH(
   req: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   const token = req.cookies.get("prowler_admin_token")?.value;
   if (!token)
@@ -12,6 +12,9 @@ export async function PATCH(
   const admin = await validateAdminSession(token);
   if (!admin)
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  // Await the asynchronous route params
+  const { id } = await params;
 
   try {
     const body = await req.json();
@@ -41,7 +44,7 @@ export async function PATCH(
     const { data, error } = await supabaseAdmin
       .from("licenses")
       .update(updates)
-      .eq("id", params.id)
+      .eq("id", id)
       .select()
       .single();
 
@@ -51,7 +54,7 @@ export async function PATCH(
       admin.email,
       "updated_license",
       "license",
-      params.id,
+      id,
       { updates }
     );
 
